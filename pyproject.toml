@@ -5,7 +5,7 @@ description = "Default template for PDM package"
 authors = [
     {name = "Mikhail M.", email = "@datanalist"},
 ]
-dependencies = ["fastapi>=0.115.12", "uvicorn>=0.34.0", "jose>=1.0.0", "bcrypt>=4.3.0", "pydantic>=2.11.2"]
+dependencies = ["fastapi>=0.115.12", "uvicorn>=0.34.0", "jose>=1.0.0", "bcrypt>=4.3.0", "pydantic>=2.11.2", "pre-commit>=4.2.0", "pyupgrade>=3.19.1", "check-jsonschema>=0.32.1", "detect-secrets>=1.5.0"]
 requires-python = "==3.11.*"
 readme = "README.md"
 license = {text = "AGPL-3.0"}
