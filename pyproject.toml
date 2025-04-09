@@ -5,7 +5,7 @@ description = "Default template for PDM package"
 authors = [
     {name = "Mikhail M.", email = "@datanalist"},
 ]
-dependencies = ["fastapi>=0.115.12", "uvicorn>=0.34.0", "jose>=1.0.0", "bcrypt>=4.3.0", "pydantic>=2.11.2", "pre-commit>=4.2.0", "pyupgrade>=3.19.1", "check-jsonschema>=0.32.1", "detect-secrets>=1.5.0", "ipykernel>=6.29.5", "pandas>=2.2.3", "python-dotenv>=1.1.0", "nest-asyncio>=1.6.0", "bs4>=0.0.2", "aiohttp>=3.11.16", "ydata-profiling>=4.16.1"]
+dependencies = ["fastapi>=0.115.12", "uvicorn>=0.34.0", "jose>=1.0.0", "bcrypt>=4.3.0", "pydantic>=2.11.2", "pre-commit>=4.2.0", "pyupgrade>=3.19.1", "check-jsonschema>=0.32.1", "detect-secrets>=1.5.0", "ipykernel>=6.29.5", "pandas>=2.2.3", "python-dotenv>=1.1.0", "nest-asyncio>=1.6.0", "bs4>=0.0.2", "aiohttp>=3.11.16", "ydata-profiling>=4.16.1", "telethon>=1.39.0", "setuptools>=78.1.0", "ipywidgets>=8.1.5", "transformers>=4.51.1", "torch>=2.6.0", "torchvision>=0.21.0", "torchaudio>=2.6.0", "razdel>=0.5.0"]
 requires-python = "==3.11.*"
 readme = "README.md"
 license = {text = "AGPL-3.0"}
