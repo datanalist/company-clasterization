@@ -51,29 +51,16 @@ def get_embeddings(context, del_na_news: pd.DataFrame):
         DataFrame с добавленными эмбеддингами
     """
     try:
-
-
-        # Загрузка модели для создания эмбеддингов
         model = SentenceTransformer('distiluse-base-multilingual-cased-v1')
-
-        # Получение текстов из DataFrame
         texts = del_na_news['text'].tolist()
-
-        # Создание эмбеддингов
         context.log.info("Начинаем создание эмбеддингов...")
         embeddings = model.encode(texts)
-
-        # Добавление эмбеддингов в DataFrame
         df_with_embeddings = del_na_news.copy()
         df_with_embeddings['embedding'] = list(embeddings)
-
         context.log.info(f"Созданы эмбеддинги для {len(df_with_embeddings)} новостей")
-
         return Output(value=df_with_embeddings)
-
     except Exception as e:
         context.log.error(f"Ошибка при создании эмбеддингов: {e}")
-        # Возвращаем исходный DataFrame в случае ошибки
         return Output(value=del_na_news)
 
 
@@ -90,21 +77,13 @@ def cluster_news(context, get_embeddings: pd.DataFrame):
         DataFrame с кластерами
     """
     try:
-        # Преобразование списка эмбеддингов в numpy массив
         embeddings_array = np.array(get_embeddings['embedding'].tolist())
-
-        # Определение оптимального количества кластеров (можно изменить)
         n_clusters = 5
-
-        # Применение KMeans для кластеризации
         kmeans = KMeans(n_clusters=n_clusters, random_state=42)
         get_embeddings['cluster'] = kmeans.fit_predict(embeddings_array)
-
         return Output(value=get_embeddings)
-
     except Exception as e:
         context.log.error(f"Ошибка при кластеризации: {e}")
-        # Возвращаем исходный DataFrame в случае ошибки
         return Output(value=get_embeddings)
 
 
@@ -121,26 +100,15 @@ def plot_news(context, cluster_news: pd.DataFrame):
         Визуализация кластеризации
     """
     try:
-        # Преобразование списка эмбеддингов в numpy массив
         embeddings_array = np.array(cluster_news['embedding'].tolist())
-
-        # Применение t-SNE для визуализации кластеров
-        tsne = TSNE(n_components=2, random_state=42, perplexity=1)
+        tsne = TSNE(n_components=3, random_state=42, perplexity=2)
         tsne_result = tsne.fit_transform(embeddings_array)
-
-        # Добавление результатов t-SNE в DataFrame
         cluster_news['tsne_x'] = tsne_result[:, 0]
         cluster_news['tsne_y'] = tsne_result[:, 1]
-
-        # Создание графика
-        fig = px.scatter(cluster_news, x='tsne_x', y='tsne_y', color='cluster', hover_data=['title'])
-
-        # Отображение графика
+        cluster_news['tsne_z'] = tsne_result[:, 2]
+        fig = px.scatter_3d(cluster_news, x='tsne_x', y='tsne_y', z='tsne_z', color='cluster', hover_data=['title'])
         fig.show()
-
         return Output(value=cluster_news)
-
     except Exception as e:
         context.log.error(f"Ошибка при визуализации: {e}")
-        # Возвращаем исходный DataFrame в случае ошибки
         return Output(value=cluster_news)
