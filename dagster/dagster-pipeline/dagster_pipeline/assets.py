@@ -19,22 +19,33 @@ def lenta_news():
     Returns:
         DataFrame с новостями, содержащий заголовки, тексты, URL и другие данные
     """
-    df = parse_lenta_news()
+    df = parse_lenta_news(days=10)
     return df
 
 @asset
-def del_na_news(context, lenta_news: pd.DataFrame):
+def union_news(context, lenta_news: pd.DataFrame):
+    """
+    Объединение новостей из разных источников.
+    """
+    news = pd.read_csv(r"C:\Users\R1\Documents\Business\company-clasterization\data\raw\news.csv")
+
+    df = pd.concat([lenta_news, news])
+    df.to_csv(r"C:\Users\R1\Documents\Business\company-clasterization\data\raw\nnews.csv", index=False)
+    return df
+
+@asset
+def del_na_news(context, union_news: pd.DataFrame):
     """
     Удаление новостей с пропущенными значениями в поле 'text'.
 
     Args:
         context: Контекст Dagster
-        lenta_news: DataFrame с новостями
+        union_news: DataFrame с новостями
 
     Returns:
         DataFrame без строк с пропущенными значениями в поле 'text'
     """
-    df = lenta_news.dropna(subset=["text"])
+    df = union_news.dropna(subset=["text"])
     context.log.info(df)
     return Output(value=df)
 

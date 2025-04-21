@@ -72,10 +72,10 @@ def parse_lenta_news(days=1):
         df = pd.DataFrame(news_data)
 
         # Создание директории для сохранения данных, если она не существует
-        os.makedirs(r"C:\Users\vallo\Documents\Business\company-clasterization\data\raw", exist_ok=True)
+        # os.makedirs("", exist_ok=True)
 
         # Сохранение данных в CSV файл
-        df.to_csv(r"C:\Users\vallo\Documents\Business\company-clasterization\data\raw\lenta-news.csv", index=False)
+        df.to_csv(r"C:\Users\R1\Documents\Business\company-clasterization\data\raw\lenta-news.csv", index=False)
 
         # print(f"Собрано {len(df)} новостей с Lenta.ru")
         # print("Данные сохранены в ./data/raw/lenta-news.csv")
