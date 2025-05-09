@@ -2,6 +2,7 @@ import re
 from typing import Literal
 import nltk
 from nltk.corpus import stopwords
+from razdel import tokenize
 
 nltk.download("stopwords")
 stop_words = stopwords.words("russian")
@@ -55,4 +56,12 @@ def clean_text(
     # Удаление эмодзи из текста
     text = emoji_pattern.sub(r"", text)
 
+    # Удаление многоточий
+    text = text.replace("...", "")
+
     return text
+
+
+def tokenize_ru(text):
+    words = tokenize(text)
+    return [word.text for word in words]
