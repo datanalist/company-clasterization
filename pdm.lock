@@ -5,7 +5,7 @@
 groups = ["default"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:8cb16330aa9f5d17456db826ea78e04f601481bd5de927cc468f5cbe50c44ce5"
+content_hash = "sha256:bdc7e0ad374d769023e887989437bc5820c77a1fae3ad81b532c163d88063be2"
 
 [[metadata.targets]]
 requires_python = "==3.11.*"
@@ -85,6 +85,24 @@ dependencies = [
 files = [
     {file = "alembic-1.15.2-py3-none-any.whl", hash = "sha256:2e76bd916d547f6900ec4bb5a90aeac1485d2c92536923d0b138c02b126edc53"},
     {file = "alembic-1.15.2.tar.gz", hash = "sha256:1c72391bbdeffccfe317eefba686cb9a3c078005478885413b95c3b26c57a8a7"},
+]
+
+[[package]]
+name = "altair"
+version = "5.5.0"
+requires_python = ">=3.9"
+summary = "Vega-Altair: A declarative statistical visualization library for Python."
+groups = ["default"]
+dependencies = [
+    "jinja2",
+    "jsonschema>=3.0",
+    "narwhals>=1.14.2",
+    "packaging",
+    "typing-extensions>=4.10.0; python_version < \"3.14\"",
+]
+files = [
+    {file = "altair-5.5.0-py3-none-any.whl", hash = "sha256:91a310b926508d560fe0148d02a194f38b824122641ef528113d029fcd129f8c"},
+    {file = "altair-5.5.0.tar.gz", hash = "sha256:d960ebe6178c56de3855a68c47b516be38640b73fb3b5111c2a9ca90546dd73d"},
 ]
 
 [[package]]
@@ -255,6 +273,17 @@ files = [
 ]
 
 [[package]]
+name = "blinker"
+version = "1.9.0"
+requires_python = ">=3.9"
+summary = "Fast, simple object-to-object and broadcast signaling"
+groups = ["default"]
+files = [
+    {file = "blinker-1.9.0-py3-none-any.whl", hash = "sha256:ba0efaa9080b619ff2f3459d1d500c57bddea4a6b424b60a91141db6fd2f08bc"},
+    {file = "blinker-1.9.0.tar.gz", hash = "sha256:b4ce2265a7abece45e7cc896e98dbebe6cead56bcf805a3d23136d145f5445bf"},
+]
+
+[[package]]
 name = "bs4"
 version = "0.0.2"
 summary = "Dummy package for Beautiful Soup (beautifulsoup4)"
@@ -265,6 +294,17 @@ dependencies = [
 files = [
     {file = "bs4-0.0.2-py2.py3-none-any.whl", hash = "sha256:abf8742c0805ef7f662dce4b51cca104cffe52b835238afc169142ab9b3fbccc"},
     {file = "bs4-0.0.2.tar.gz", hash = "sha256:a48685c58f50fe127722417bae83fe6badf500d54b55f7e39ffe43b798653925"},
+]
+
+[[package]]
+name = "cachetools"
+version = "5.5.2"
+requires_python = ">=3.7"
+summary = "Extensible memoizing collections and decorators"
+groups = ["default"]
+files = [
+    {file = "cachetools-5.5.2-py3-none-any.whl", hash = "sha256:d26a22bcc62eb95c3beabd9f1ee5e820d3d2704fe2967cbe350e20c8ffcd3f0a"},
+    {file = "cachetools-5.5.2.tar.gz", hash = "sha256:1a661caa9175d26759571b2e19580f9d6393969e5dfca11fdb1f947a23e640d4"},
 ]
 
 [[package]]
@@ -667,6 +707,20 @@ files = [
 ]
 
 [[package]]
+name = "ecdsa"
+version = "0.19.1"
+requires_python = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,>=2.6"
+summary = "ECDSA cryptographic signature library (pure python)"
+groups = ["default"]
+dependencies = [
+    "six>=1.9.0",
+]
+files = [
+    {file = "ecdsa-0.19.1-py2.py3-none-any.whl", hash = "sha256:30638e27cf77b7e15c4c4cc1973720149e1033827cfd00661ca5c8cc0cdb24c3"},
+    {file = "ecdsa-0.19.1.tar.gz", hash = "sha256:478cba7b62555866fcb3bb3fe985e06decbdb68ef55713c4e5ab98c57d508e61"},
+]
+
+[[package]]
 name = "executing"
 version = "2.2.0"
 requires_python = ">=3.8"
@@ -770,6 +824,35 @@ groups = ["default"]
 files = [
     {file = "fsspec-2025.3.2-py3-none-any.whl", hash = "sha256:2daf8dc3d1dfa65b6aa37748d112773a7a08416f6c70d96b264c96476ecaf711"},
     {file = "fsspec-2025.3.2.tar.gz", hash = "sha256:e52c77ef398680bbd6a98c0e628fbc469491282981209907bbc8aea76a04fdc6"},
+]
+
+[[package]]
+name = "gitdb"
+version = "4.0.12"
+requires_python = ">=3.7"
+summary = "Git Object Database"
+groups = ["default"]
+dependencies = [
+    "smmap<6,>=3.0.1",
+]
+files = [
+    {file = "gitdb-4.0.12-py3-none-any.whl", hash = "sha256:67073e15955400952c6565cc3e707c554a4eea2e428946f7a4c162fab9bd9bcf"},
+    {file = "gitdb-4.0.12.tar.gz", hash = "sha256:5ef71f855d191a3326fcfbc0d5da835f26b13fbcba60c32c21091c349ffdb571"},
+]
+
+[[package]]
+name = "gitpython"
+version = "3.1.44"
+requires_python = ">=3.7"
+summary = "GitPython is a Python library used to interact with Git repositories"
+groups = ["default"]
+dependencies = [
+    "gitdb<5,>=4.0.1",
+    "typing-extensions>=3.7.4.3; python_version < \"3.8\"",
+]
+files = [
+    {file = "GitPython-3.1.44-py3-none-any.whl", hash = "sha256:9e0e10cda9bed1ee64bc9a6de50e7e38a9c9943241cd7f585f6df3ed28011110"},
+    {file = "gitpython-3.1.44.tar.gz", hash = "sha256:c87e30b26253bf5418b01b0660f818967f3c503193838337fe5e573331249269"},
 ]
 
 [[package]]
@@ -1182,15 +1265,6 @@ groups = ["default"]
 files = [
     {file = "joblib-1.5.0-py3-none-any.whl", hash = "sha256:206144b320246485b712fc8cc51f017de58225fa8b414a1fe1764a7231aca491"},
     {file = "joblib-1.5.0.tar.gz", hash = "sha256:d8757f955389a3dd7a23152e43bc297c2e0c2d3060056dad0feefc88a06939b5"},
-]
-
-[[package]]
-name = "jose"
-version = "1.0.0"
-summary = "An implementation of the JOSE draft"
-groups = ["default"]
-files = [
-    {file = "jose-1.0.0.tar.gz", hash = "sha256:8436c3617cd94e1ba97828fbb1ce27c129f66c78fb855b4bb47e122b5f345fba"},
 ]
 
 [[package]]
@@ -1807,13 +1881,13 @@ files = [
 
 [[package]]
 name = "packaging"
-version = "25.0"
+version = "24.2"
 requires_python = ">=3.8"
 summary = "Core utilities for Python packages"
 groups = ["default"]
 files = [
-    {file = "packaging-25.0-py3-none-any.whl", hash = "sha256:29572ef2b1f17581046b3a2227d5c611fb25ec70ca1ba8554b24b0e69331a484"},
-    {file = "packaging-25.0.tar.gz", hash = "sha256:d443872c98d677bf60f6a1f2f8c1cb748e8fe762d2bf9d3148b5599295b0fc4f"},
+    {file = "packaging-24.2-py3-none-any.whl", hash = "sha256:09abb1bccd265c01f4a3aa3f7a7db064b36514d2cba19a2f694fe6150451a759"},
+    {file = "packaging-24.2.tar.gz", hash = "sha256:c228a6dc5e932d346bc5739379109d49e8853dd8223571c7c5b55260edc0b97f"},
 ]
 
 [[package]]
@@ -1850,6 +1924,16 @@ groups = ["default"]
 files = [
     {file = "parso-0.8.4-py2.py3-none-any.whl", hash = "sha256:a418670a20291dacd2dddc80c377c5c3791378ee1e8d12bffc35420643d43f18"},
     {file = "parso-0.8.4.tar.gz", hash = "sha256:eb3a7b58240fb99099a345571deecc0f9540ea5f4dd2fe14c2a99d6b281ab92d"},
+]
+
+[[package]]
+name = "passlib"
+version = "1.7.4"
+summary = "comprehensive password hashing framework supporting over 30 schemes"
+groups = ["default"]
+files = [
+    {file = "passlib-1.7.4-py2.py3-none-any.whl", hash = "sha256:aa6bca462b8d8bda89c70b382f0c298a20b5560af6cbfa2dce410c0a2fb669f1"},
+    {file = "passlib-1.7.4.tar.gz", hash = "sha256:defd50f72b65c5402ab2c573830a6978e5f202ad0d984793c8dde2c4152ebe04"},
 ]
 
 [[package]]
@@ -2110,14 +2194,32 @@ files = [
 ]
 
 [[package]]
-name = "pyasn1"
-version = "0.6.1"
-requires_python = ">=3.8"
-summary = "Pure-Python implementation of ASN.1 types and DER/BER/CER codecs (X.208)"
+name = "pyarrow"
+version = "20.0.0"
+requires_python = ">=3.9"
+summary = "Python library for Apache Arrow"
 groups = ["default"]
 files = [
-    {file = "pyasn1-0.6.1-py3-none-any.whl", hash = "sha256:0d632f46f2ba09143da3a8afe9e33fb6f92fa2320ab7e886e2d0f7672af84629"},
-    {file = "pyasn1-0.6.1.tar.gz", hash = "sha256:6f580d2bdd84365380830acf45550f2511469f673cb4a5ae3857a3170128b034"},
+    {file = "pyarrow-20.0.0-cp311-cp311-macosx_12_0_arm64.whl", hash = "sha256:24ca380585444cb2a31324c546a9a56abbe87e26069189e14bdba19c86c049f0"},
+    {file = "pyarrow-20.0.0-cp311-cp311-macosx_12_0_x86_64.whl", hash = "sha256:95b330059ddfdc591a3225f2d272123be26c8fa76e8c9ee1a77aad507361cfdb"},
+    {file = "pyarrow-20.0.0-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:5f0fb1041267e9968c6d0d2ce3ff92e3928b243e2b6d11eeb84d9ac547308232"},
+    {file = "pyarrow-20.0.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:b8ff87cc837601532cc8242d2f7e09b4e02404de1b797aee747dd4ba4bd6313f"},
+    {file = "pyarrow-20.0.0-cp311-cp311-manylinux_2_28_aarch64.whl", hash = "sha256:7a3a5dcf54286e6141d5114522cf31dd67a9e7c9133d150799f30ee302a7a1ab"},
+    {file = "pyarrow-20.0.0-cp311-cp311-manylinux_2_28_x86_64.whl", hash = "sha256:a6ad3e7758ecf559900261a4df985662df54fb7fdb55e8e3b3aa99b23d526b62"},
+    {file = "pyarrow-20.0.0-cp311-cp311-musllinux_1_2_aarch64.whl", hash = "sha256:6bb830757103a6cb300a04610e08d9636f0cd223d32f388418ea893a3e655f1c"},
+    {file = "pyarrow-20.0.0-cp311-cp311-musllinux_1_2_x86_64.whl", hash = "sha256:96e37f0766ecb4514a899d9a3554fadda770fb57ddf42b63d80f14bc20aa7db3"},
+    {file = "pyarrow-20.0.0-cp311-cp311-win_amd64.whl", hash = "sha256:3346babb516f4b6fd790da99b98bed9708e3f02e734c84971faccb20736848dc"},
+    {file = "pyarrow-20.0.0.tar.gz", hash = "sha256:febc4a913592573c8d5805091a6c2b5064c8bd6e002131f01061797d91c783c1"},
+]
+
+[[package]]
+name = "pyasn1"
+version = "0.4.8"
+summary = "ASN.1 types and codecs"
+groups = ["default"]
+files = [
+    {file = "pyasn1-0.4.8-py2.py3-none-any.whl", hash = "sha256:39c7e2ec30515947ff4e87fb6f456dfc6e84857d34be479c9d4a4ba4bf46aa5d"},
+    {file = "pyasn1-0.4.8.tar.gz", hash = "sha256:aef77c9fb94a3ac588e87841208bdec464471d9871bd5050a287cc9a475cd0ba"},
 ]
 
 [[package]]
@@ -2183,6 +2285,21 @@ files = [
     {file = "pydantic_core-2.33.2-pp311-pypy311_pp73-musllinux_1_1_x86_64.whl", hash = "sha256:82f68293f055f51b51ea42fafc74b6aad03e70e191799430b90c13d643059ebb"},
     {file = "pydantic_core-2.33.2-pp311-pypy311_pp73-win_amd64.whl", hash = "sha256:329467cecfb529c925cf2bbd4d60d2c509bc2fb52a20c1045bf09bb70971a9c1"},
     {file = "pydantic_core-2.33.2.tar.gz", hash = "sha256:7cb8bc3605c29176e1b105350d2e6474142d7c1bd1d9327c4a9bdb46bf827acc"},
+]
+
+[[package]]
+name = "pydeck"
+version = "0.9.1"
+requires_python = ">=3.8"
+summary = "Widget for deck.gl maps"
+groups = ["default"]
+dependencies = [
+    "jinja2>=2.10.1",
+    "numpy>=1.16.4",
+]
+files = [
+    {file = "pydeck-0.9.1-py2.py3-none-any.whl", hash = "sha256:b3f75ba0d273fc917094fa61224f3f6076ca8752b93d46faf3bcfd9f9d59b038"},
+    {file = "pydeck-0.9.1.tar.gz", hash = "sha256:f74475ae637951d63f2ee58326757f8d4f9cd9f2a457cf42950715003e2cb605"},
 ]
 
 [[package]]
@@ -2279,6 +2396,21 @@ groups = ["default"]
 files = [
     {file = "python_dotenv-1.1.0-py3-none-any.whl", hash = "sha256:d7c01d9e2293916c18baf562d95698754b0dbbb5e74d457c45d4f6561fb9d55d"},
     {file = "python_dotenv-1.1.0.tar.gz", hash = "sha256:41f90bc6f5f177fb41f53e87666db362025010eb28f60a01c9143bfa33a2b2d5"},
+]
+
+[[package]]
+name = "python-jose"
+version = "3.4.0"
+summary = "JOSE implementation in Python"
+groups = ["default"]
+dependencies = [
+    "ecdsa!=0.15",
+    "pyasn1<0.5.0,>=0.4.1",
+    "rsa!=4.1.1,!=4.4,<5.0,>=4.0",
+]
+files = [
+    {file = "python-jose-3.4.0.tar.gz", hash = "sha256:9a9a40f418ced8ecaf7e3b28d69887ceaa76adad3bcaa6dae0d9e596fec1d680"},
+    {file = "python_jose-3.4.0-py2.py3-none-any.whl", hash = "sha256:9c9f616819652d109bd889ecd1e15e9a162b9b94d682534c9c2146092945b78f"},
 ]
 
 [[package]]
@@ -2733,6 +2865,17 @@ files = [
 ]
 
 [[package]]
+name = "smmap"
+version = "5.0.2"
+requires_python = ">=3.7"
+summary = "A pure Python implementation of a sliding window memory map manager"
+groups = ["default"]
+files = [
+    {file = "smmap-5.0.2-py3-none-any.whl", hash = "sha256:b30115f0def7d7531d22a0fb6502488d879e75b260a9db4d0819cfb25403af5e"},
+    {file = "smmap-5.0.2.tar.gz", hash = "sha256:26ea65a03958fa0c8a1c7e8c7a58fdc77221b8910f6be2131affade476898ad5"},
+]
+
+[[package]]
 name = "sniffio"
 version = "1.3.1"
 requires_python = ">=3.7"
@@ -2832,6 +2975,37 @@ files = [
 ]
 
 [[package]]
+name = "streamlit"
+version = "1.45.1"
+requires_python = "!=3.9.7,>=3.9"
+summary = "A faster way to build and share data apps"
+groups = ["default"]
+dependencies = [
+    "altair<6,>=4.0",
+    "blinker<2,>=1.5.0",
+    "cachetools<6,>=4.0",
+    "click<9,>=7.0",
+    "gitpython!=3.1.19,<4,>=3.0.7",
+    "numpy<3,>=1.23",
+    "packaging<25,>=20",
+    "pandas<3,>=1.4.0",
+    "pillow<12,>=7.1.0",
+    "protobuf<7,>=3.20",
+    "pyarrow>=7.0",
+    "pydeck<1,>=0.8.0b4",
+    "requests<3,>=2.27",
+    "tenacity<10,>=8.1.0",
+    "toml<2,>=0.10.1",
+    "tornado<7,>=6.0.3",
+    "typing-extensions<5,>=4.4.0",
+    "watchdog<7,>=2.1.5; platform_system != \"Darwin\"",
+]
+files = [
+    {file = "streamlit-1.45.1-py3-none-any.whl", hash = "sha256:9ab6951585e9444672dd650850f81767b01bba5d87c8dac9bc2e1c859d6cc254"},
+    {file = "streamlit-1.45.1.tar.gz", hash = "sha256:e37d56c0af5240dbc240976880e81366689c290a559376417246f9b3f51b4217"},
+]
+
+[[package]]
 name = "structlog"
 version = "25.3.0"
 requires_python = ">=3.8"
@@ -2886,6 +3060,17 @@ files = [
 ]
 
 [[package]]
+name = "tenacity"
+version = "9.1.2"
+requires_python = ">=3.9"
+summary = "Retry code until it succeeds"
+groups = ["default"]
+files = [
+    {file = "tenacity-9.1.2-py3-none-any.whl", hash = "sha256:f77bf36710d8b73a50b2dd155c97b870017ad21afe6ab300326b0371b3b05138"},
+    {file = "tenacity-9.1.2.tar.gz", hash = "sha256:1169d376c297e7de388d18b4481760d478b0e99a777cad3a9c86e556f4b697cb"},
+]
+
+[[package]]
 name = "threadpoolctl"
 version = "3.6.0"
 requires_python = ">=3.9"
@@ -2932,6 +3117,17 @@ files = [
     {file = "tokenizers-0.21.1-cp39-abi3-win32.whl", hash = "sha256:1039a3a5734944e09de1d48761ade94e00d0fa760c0e0551151d4dd851ba63e3"},
     {file = "tokenizers-0.21.1-cp39-abi3-win_amd64.whl", hash = "sha256:0f0dcbcc9f6e13e675a66d7a5f2f225a736745ce484c1a4e07476a89ccdad382"},
     {file = "tokenizers-0.21.1.tar.gz", hash = "sha256:a1bb04dc5b448985f86ecd4b05407f5a8d97cb2c0532199b2a302a604a0165ab"},
+]
+
+[[package]]
+name = "toml"
+version = "0.10.2"
+requires_python = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
+summary = "Python Library for Tom's Obvious, Minimal Language"
+groups = ["default"]
+files = [
+    {file = "toml-0.10.2-py2.py3-none-any.whl", hash = "sha256:806143ae5bfb6a3c6e736a764057db0e6a0e05e338b5630894a5f779cabb4f9b"},
+    {file = "toml-0.10.2.tar.gz", hash = "sha256:b3bda1d108d5dd99f4a20d24d9c348e91c4db7ab1b749200bded2f839ccbe68f"},
 ]
 
 [[package]]

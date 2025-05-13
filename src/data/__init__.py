@@ -1,3 +1,3 @@
-from data.prepare import clean_text, tokenize_ru
+from .prepare import clean_text, tokenize_ru
 
 __all__ = ["clean_text", "tokenize_ru"]

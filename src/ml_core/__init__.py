@@ -1,8 +1,8 @@
 """
-Пакет ml_pipeline
+Пакет ml_core
 """
 
-from ml_pipeline.models import (
+from .models import (
     EmbeddingModel,
     ReductionModel,
     ClusteringModel,
