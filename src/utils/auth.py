@@ -8,6 +8,7 @@ import os
 from dotenv import load_dotenv
 
 from ..database.database import get_user_by_username
+from ..data.parse_lenta import parse_lenta_news
 
 # Загрузка переменных окружения
 load_dotenv()
@@ -22,6 +23,9 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # Создаем схему проверки токена
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/token")
+
+# Список пользователей-администраторов (можно хранить в базе данных)
+ADMIN_USERS = os.getenv("ADMIN_USERS", "admin").split(",")
 
 
 def verify_password(plain_password, hashed_password):
@@ -61,3 +65,24 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     if user is None:
         raise credentials_exception
     return user
+
+
+async def get_current_admin_user(current_user: dict = Depends(get_current_user)):
+    """
+    Проверяет, является ли текущий пользователь администратором.
+    
+    Зависит от get_current_user для получения информации о пользователе
+    из токена аутентификации.
+    
+    Возвращает:
+        dict: Информация о пользователе, если он администратор
+        
+    Исключения:
+        HTTPException: Если пользователь не является администратором
+    """
+    if current_user["username"] not in ADMIN_USERS:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Требуются права администратора"
+        )
+    return current_user

@@ -5,7 +5,7 @@ from database import *
 
 __all__ = [
     # Экспортируемые функции из модуля data
-    "load_data", "preprocess_data", "split_data",
+    "load_data", "preprocess_data", "split_data", "parse_lenta_news",
     
     # Экспортируемые функции из модуля ml_core
     "train_model", "evaluate_model", "predict",

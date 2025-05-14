@@ -14,7 +14,8 @@ def run_backend(host="0.0.0.0", port=8000, reload=True):
         "-m", "uvicorn", 
         "src.app:app", 
         "--host", host, 
-        "--port", str(port)
+        "--port", str(port),
+        "--log-level", "warning"  # Снижаем уровень логирования
     ]
     
     if reload:
@@ -79,6 +80,20 @@ def create_directories():
     os.makedirs("data/processed", exist_ok=True)
     os.makedirs("models", exist_ok=True)
 
+def run_migration():
+    """Запускает миграцию базы данных"""
+    print("Запуск миграции базы данных...")
+    
+    try:
+        # Импортируем и запускаем функцию миграции
+        from src.database.database import initialize_database
+        initialize_database()
+        print("Миграция базы данных успешно выполнена")
+        return True
+    except Exception as e:
+        print(f"Ошибка при миграции базы данных: {e}")
+        return False
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Запуск системы кластеризации компаний")
     parser.add_argument("--backend-host", default="0.0.0.0", help="Хост для бэкенда FastAPI")
@@ -87,6 +102,7 @@ if __name__ == "__main__":
     parser.add_argument("--frontend-port", type=int, default=8501, help="Порт для фронтенда Streamlit")
     parser.add_argument("--no-reload", action="store_true", help="Отключить автоматическую перезагрузку бэкенда")
     parser.add_argument("--skip-check", action="store_true", help="Пропустить проверку зависимостей")
+    parser.add_argument("--migrate", action="store_true", help="Выполнить миграцию базы данных перед запуском")
     
     args = parser.parse_args()
     
@@ -96,6 +112,14 @@ if __name__ == "__main__":
     
     # Создаем необходимые директории
     create_directories()
+    
+    # Запускаем миграцию базы данных, если указан флаг --migrate
+    if args.migrate and not run_migration():
+        print("Миграция базы данных завершилась с ошибкой. Продолжить запуск? (y/n)")
+        response = input().lower()
+        if response != 'y':
+            print("Выход...")
+            sys.exit(1)
     
     processes = []
     

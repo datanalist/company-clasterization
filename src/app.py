@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Depends, status, BackgroundTasks
+from fastapi import FastAPI, HTTPException, Depends, status, BackgroundTasks, File, UploadFile, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from typing import List, Dict, Optional, Any
@@ -30,7 +30,16 @@ from .models.models import (
     CompanyInfo,
     DateRangeFilter,
     User,
-    UserCreate
+    UserCreate,
+    MLModelConfig,
+    MLModelUpload,
+    MLModelsList,
+    CreditPackage,
+    CreditPurchase,
+    UserStats,
+    SystemStats,
+    MathProblem,
+    MathSolution
 )
 from .database.database import (
     get_db_connection,
@@ -40,13 +49,26 @@ from .database.database import (
     update_user_credits,
     save_clustering_result,
     get_clustering_results,
-    get_clustering_result_by_id
+    get_clustering_result_by_id,
+    get_ml_models,
+    get_default_ml_models,
+    add_ml_model,
+    get_credit_packages,
+    get_credit_package,
+    purchase_credits,
+    get_user_stats,
+    get_system_stats,
+    get_credit_history,
+    get_math_problem,
+    validate_math_solution,
+    get_user_by_id
 )
 from .utils.auth import (
     get_password_hash,
     verify_password,
     create_access_token,
-    get_current_user
+    get_current_user,
+    get_current_admin_user
 )
 
 # Создаем директории если их нет
@@ -109,8 +131,11 @@ async def start_clustering(
     background_tasks: BackgroundTasks,
     current_user: dict = Depends(get_current_user)
 ):
+    # Определяем стоимость в кредитах (можно сделать динамически в зависимости от выбранных моделей)
+    credits_cost = 10
+    
     # Проверяем кредиты пользователя
-    if current_user["credits"] < 10:  # Стоимость кластеризации
+    if current_user["credits"] < credits_cost:
         raise HTTPException(
             status_code=status.HTTP_402_PAYMENT_REQUIRED,
             detail="Недостаточно кредитов"
@@ -124,11 +149,9 @@ async def start_clustering(
         perform_clustering_task,
         task_id=task_id,
         request=request,
-        user_id=current_user["id"]
+        user_id=current_user["id"],
+        credits_cost=credits_cost  # Передаем стоимость задачи
     )
-    
-    # Списываем кредиты пользователя
-    update_user_credits(current_user["id"], current_user["credits"] - 10)
     
     return {"task_id": task_id, "status": "started"}
 
@@ -158,38 +181,174 @@ def get_clustering_result(
     
     return result
 
-async def perform_clustering_task(task_id: str, request: ClusteringRequest, user_id: int):
+@app.get("/api/ml/models", response_model=MLModelsList)
+def get_available_ml_models(current_user: dict = Depends(get_current_user)):
+    """Получает список доступных ML-моделей по типам"""
+    all_models = get_ml_models()
+    
+    # Группируем модели по типу
+    embedding_models = [model for model in all_models if model["type"] == "embedding"]
+    reduction_models = [model for model in all_models if model["type"] == "reduction"]
+    clustering_models = [model for model in all_models if model["type"] == "clustering"]
+    
+    return {
+        "embedding_models": embedding_models,
+        "reduction_models": reduction_models,
+        "clustering_models": clustering_models
+    }
+
+@app.get("/api/ml/models/default")
+def get_default_models(current_user: dict = Depends(get_current_user)):
+    """Получает набор дефолтных ML-моделей"""
+    default_models = get_default_ml_models()
+    return default_models
+
+@app.post("/api/ml/models", response_model=MLModelConfig)
+def upload_ml_model(
+    model: MLModelUpload,
+    current_user: dict = Depends(get_current_admin_user)
+):
+    """Добавляет новую ML-модель (требуются права администратора)"""
+    return add_ml_model(model.dict())
+
+@app.get("/api/credits/packages", response_model=List[CreditPackage])
+def get_available_credit_packages(current_user: dict = Depends(get_current_user)):
+    """Получает список доступных пакетов кредитов"""
+    return get_credit_packages()
+
+@app.post("/api/credits/purchase")
+def buy_credits(
+    purchase: CreditPurchase,
+    current_user: dict = Depends(get_current_user)
+):
+    """Покупка кредитов"""
+    # Проверяем существование пакета
+    package = get_credit_package(purchase.package_id)
+    if not package:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Пакет кредитов не найден"
+        )
+    
+    # В реальном приложении здесь был бы код для обработки платежа
+    # Например, вызов API платежной системы
+    
+    # Пока просто добавляем кредиты
+    success = purchase_credits(current_user["id"], purchase.package_id, purchase.payment_method)
+    
+    if not success:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Ошибка при покупке кредитов"
+        )
+    
+    # Получаем обновленную информацию о пользователе
+    updated_user = get_user_by_username(current_user["username"])
+    
+    return {
+        "status": "success",
+        "message": f"Кредиты успешно добавлены. Ваш баланс: {updated_user['credits']}",
+        "credits": updated_user["credits"]
+    }
+
+@app.get("/api/credits/history")
+def get_user_credit_history(current_user: dict = Depends(get_current_user)):
+    """Получает историю транзакций по кредитам пользователя"""
+    return get_credit_history(current_user["id"])
+
+@app.get("/api/credits/math-problem", response_model=MathProblem)
+def generate_math_problem(current_user: dict = Depends(get_current_user)):
+    """Генерирует случайную математическую задачу для пополнения кредитов"""
+    return get_math_problem()
+
+@app.post("/api/credits/math-solution")
+def check_math_solution(
+    solution: MathSolution,
+    current_user: dict = Depends(get_current_user)
+):
+    """Проверяет решение математической задачи и пополняет кредиты при правильном ответе"""
+    success, message = validate_math_solution(
+        solution.problem_id,
+        solution.answer,
+        current_user["id"]
+    )
+    
+    if success:
+        # Получаем обновленную информацию о пользователе
+        updated_user = get_user_by_username(current_user["username"])
+        
+        return {
+            "success": True,
+            "message": message,
+            "credits": updated_user["credits"]
+        }
+    else:
+        return {
+            "success": False,
+            "message": message
+        }
+
+@app.get("/api/stats/user", response_model=UserStats)
+def get_current_user_stats(current_user: dict = Depends(get_current_user)):
+    """Получает статистику использования сервиса текущим пользователем"""
+    return get_user_stats(current_user["id"])
+
+@app.get("/api/stats/system", response_model=SystemStats)
+def get_general_system_stats(current_user: dict = Depends(get_current_admin_user)):
+    """Получает общую статистику использования системы (требуются права администратора)"""
+    return get_system_stats()
+
+async def perform_clustering_task(task_id: str, request: ClusteringRequest, user_id: int, credits_cost: int):
     try:
-        # Загрузка новостей
-        from data.parse_tg import parse_forbes_news
+        # Импортируем модули для парсинга
         from data.parse_lenta import parse_lenta_news
+        
+        # Telegram парсер (в разработке, не используется по умолчанию)
+        # from data.parse_tg import parse_forbes_news
         
         # Определяем период времени для анализа
         start_date = datetime.strptime(request.date_range.start_date, "%Y-%m-%d")
         end_date = datetime.strptime(request.date_range.end_date, "%Y-%m-%d")
         days = (end_date - start_date).days + 1
         
-        # Получаем данные
-        # Используем asyncio.to_thread для запуска синхронных функций асинхронно
-        forbes_news_future = asyncio.create_task(
-            asyncio.to_thread(lambda: asyncio.run(parse_forbes_news(days=days)))
-        )
+        # Получаем пользовательскую конфигурацию моделей или дефолтные
+        ml_config = request.ml_config or {}
+        default_models = get_default_ml_models()
+        
+        # Определяем, какие модели использовать
+        embedding_model_config = ml_config.get("embedding", default_models.get("embedding", {}).get("config", {}))
+        reduction_model_config = ml_config.get("reduction", default_models.get("reduction", {}).get("config", {}))
+        clustering_model_config = ml_config.get("clustering", default_models.get("clustering", {}).get("config", {}))
+        
+        # Получаем данные только из Lenta.ru
+        print(f"Загрузка новостей с Lenta.ru за {days} дней...")
         lenta_news_future = asyncio.create_task(
             asyncio.to_thread(lambda: parse_lenta_news(days=days))
         )
         
-        # Ждем выполнения обоих задач
-        forbes_df = await forbes_news_future
+        # Ждем выполнения задачи
         lenta_df = await lenta_news_future
         
-        # Объединяем данные
-        forbes_df = forbes_df.rename(columns={"text": "text", "date": "date"})
-        forbes_df["source"] = "forbes"
+        # Создаем пустой DataFrame для Forbes (Telegram) - в разработке
+        # Пример пустого DataFrame с такой же структурой как у lenta_df
+        forbes_df = pd.DataFrame(columns=lenta_df.columns)
+        forbes_df["source"] = "forbes (в разработке)"
+        
+        # Опциональный парсинг Telegram (в разработке, закомментирован)
+        # print(f"Загрузка новостей из Telegram за {days} дней...")
+        # forbes_news_future = asyncio.create_task(
+        #     asyncio.to_thread(lambda: asyncio.run(parse_forbes_news(days=days)))
+        # )
+        # forbes_df = await forbes_news_future
+        # forbes_df = forbes_df.rename(columns={"text": "text", "date": "date"})
+        # forbes_df["source"] = "forbes"
+        
+        # Подготавливаем данные Lenta.ru
         lenta_df = lenta_df.rename(columns={"text": "text", "date": "date"})
         lenta_df["source"] = "lenta"
         
-        # Объединение данных
-        news_df = pd.concat([forbes_df, lenta_df], ignore_index=True)
+        # Объединение данных (включаем только Lenta.ru)
+        news_df = lenta_df
         
         # Фильтруем по дате
         news_df['date'] = pd.to_datetime(news_df['date'])
@@ -198,36 +357,27 @@ async def perform_clustering_task(task_id: str, request: ClusteringRequest, user
             (news_df['date'] <= end_date)
         ]
         
+        # Проверка на наличие данных
+        if len(news_df) == 0:
+            raise ValueError(f"Не найдено новостей в указанный период ({start_date} - {end_date})")
+        
+        print(f"Загружено {len(news_df)} новостей")
+        
         # Очистка текста
         news_df['cleaned_text'] = news_df['text'].apply(clean_text)
         
-        # Загрузка модели эмбеддингов
-        embedding_model = EmbeddingModel(
-            method="sentence_transformer",
-            model_name_or_path="DeepPavlov/rubert-base-cased"
-        )
+        # Загрузка модели эмбеддингов с использованием пользовательской конфигурации
+        embedding_model = EmbeddingModel(**embedding_model_config)
         
         # Создание эмбеддингов для текстов
         embeddings = embedding_model.encode(news_df['cleaned_text'].tolist())
         
-        # Снижение размерности
-        reduction_model = ReductionModel(
-            method="umap",
-            n_neighbors=15,
-            n_components=100,
-            min_dist=0.0,
-            metric='euclidean'
-        )
+        # Снижение размерности с использованием пользовательской конфигурации
+        reduction_model = ReductionModel(**reduction_model_config)
         reduced_embeddings = reduction_model.fit_transform(embeddings)
         
-        # Кластеризация
-        clustering_model = ClusteringModel(
-            model_name="hdbscan",
-            min_cluster_size=15,
-            metric='euclidean',
-            cluster_selection_method='eom',
-            prediction_data=True
-        )
+        # Кластеризация с использованием пользовательской конфигурации
+        clustering_model = ClusteringModel(**clustering_model_config)
         clusters = clustering_model.fit_predict(reduced_embeddings)
         
         # Векторизатор для выделения ключевых слов
@@ -378,6 +528,25 @@ async def perform_clustering_task(task_id: str, request: ClusteringRequest, user
         except Exception as e:
             print(f"Ошибка при создании визуализации: {e}")
         
+        # Сохраняем информацию об использованных моделях
+        used_ml_config = {
+            "embedding": embedding_model_config,
+            "reduction": reduction_model_config,
+            "clustering": clustering_model_config
+        }
+        
+        # Списываем кредиты только при успешном выполнении задачи
+        # Получаем актуальную информацию о пользователе
+        user = get_user_by_id(user_id)
+        if user:
+            # Списываем кредиты
+            update_user_credits(
+                user_id, 
+                user["credits"] - credits_cost,
+                transaction_type="usage",
+                description=f"Кластеризация успешно выполнена (ID: {task_id})"
+            )
+        
         # Сохраняем результаты кластеризации
         result = {
             "id": task_id,
@@ -389,13 +558,15 @@ async def perform_clustering_task(task_id: str, request: ClusteringRequest, user
             },
             "clusters": [clusters_data[cluster_id] for cluster_id in clusters_data],
             "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "visualization_path": f"viz_{task_id}.json"
+            "visualization_path": f"viz_{task_id}.json",
+            "ml_config": used_ml_config,
+            "credits_used": credits_cost  # Используем переданное значение стоимости
         }
         
         save_clustering_result(result)
         
     except Exception as e:
-        # В случае ошибки сохраняем информацию об ошибке
+        # В случае ошибки сохраняем информацию об ошибке, но НЕ списываем кредиты
         error_result = {
             "id": task_id,
             "user_id": user_id,
@@ -405,7 +576,8 @@ async def perform_clustering_task(task_id: str, request: ClusteringRequest, user
                 "end_date": request.date_range.end_date
             },
             "error": str(e),
-            "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "credits_used": 0  # При ошибке кредиты не списываются
         }
         save_clustering_result(error_result)
 

@@ -10,6 +10,7 @@ class DateRangeFilter(BaseModel):
 
 class ClusteringRequest(BaseModel):
     date_range: DateRangeFilter
+    ml_config: Optional[Dict[str, Any]] = None
 
 
 class CompanyInfo(BaseModel):
@@ -36,6 +37,8 @@ class ClusteringResult(BaseModel):
     error: Optional[str] = None
     created_at: str
     visualization_path: Optional[str] = None
+    ml_config: Optional[Dict[str, Any]] = None
+    credits_used: int = 10
 
 
 class ClusteringResponse(BaseModel):
@@ -54,4 +57,70 @@ class User(BaseModel):
     username: str
     email: str
     credits: int
-    created_at: str 
+    created_at: str
+
+
+# Новые модели для работы с ML-моделями
+class MLModelConfig(BaseModel):
+    id: Optional[int] = None
+    name: str
+    type: str  # embedding, reduction, clustering
+    config: Dict[str, Any]
+    is_default: bool = False
+    created_at: Optional[str] = None
+    
+
+class MLModelUpload(BaseModel):
+    name: str
+    type: str
+    config: Dict[str, Any]
+    is_default: bool = False
+
+
+class MLModelsList(BaseModel):
+    embedding_models: List[MLModelConfig]
+    reduction_models: List[MLModelConfig]
+    clustering_models: List[MLModelConfig]
+
+
+# Модели для пополнения кредитов
+class CreditPackage(BaseModel):
+    id: int
+    name: str
+    credits: int
+    price: float
+    description: Optional[str] = None
+
+
+class CreditPurchase(BaseModel):
+    package_id: int
+    payment_method: str
+
+
+# Модели для аналитики
+class UserStats(BaseModel):
+    total_clustering_tasks: int
+    successful_tasks: int
+    failed_tasks: int
+    credits_spent: int
+    avg_clusters_per_task: float
+
+
+class SystemStats(BaseModel):
+    total_users: int
+    active_users: int
+    total_tasks: int
+    credits_spent: int
+    popular_models: Dict[str, int] 
+
+
+# Модели для математических задач
+class MathProblem(BaseModel):
+    id: str
+    problem: str
+    expires_at: str
+
+
+class MathSolution(BaseModel):
+    problem_id: str
+    answer: float 
