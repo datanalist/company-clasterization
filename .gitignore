@@ -1,4 +1,9 @@
-# Byte-compiled / optimized / DLL files
+/data/raw/*
+/data/processed/*
+/data/interim/*
+/data/external/*
+
+ Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
@@ -139,7 +144,7 @@ venv.bak/
 /data/
 
 # Spyder project settings
-.spyderproject
+.spyderproject  
 .spyproject
 
 # Rope project settings
@@ -174,3 +179,8 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+data/raw/*
+data/processed/*
+data/interim/*
+data/external/*
