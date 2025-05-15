@@ -5,6 +5,7 @@ from dagster import asset, Output
 from sklearn.cluster import KMeans
 from sklearn.manifold import TSNE
 import plotly.express as px
+from datetime import datetime, timedelta
 
 from .parse_lenta import parse_lenta_news
 
@@ -15,11 +16,17 @@ def lenta_news():
 
     Этот ассет использует функцию parse_lenta_news для сбора новостей
     с сайта Lenta.ru и возвращает их в виде DataFrame.
+    ВАЖНО: Вызываемая функция parse_lenta_news из .parse_lenta
+    является устаревшей версией и парсит только главную страницу,
+    несмотря на передаваемые даты.
 
     Returns:
         DataFrame с новостями, содержащий заголовки, тексты, URL и другие данные
     """
-    df = parse_lenta_news(days=10)
+    end_date = datetime.now()
+    start_date = end_date - timedelta(days=9)
+    
+    df = parse_lenta_news(start_date=start_date, end_date=end_date)
     return df
 
 @asset

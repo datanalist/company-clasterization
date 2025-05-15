@@ -8,7 +8,6 @@ import os
 from dotenv import load_dotenv
 
 from ..database.database import get_user_by_username
-from ..data.parse_lenta import parse_lenta_news
 
 # Загрузка переменных окружения
 load_dotenv()

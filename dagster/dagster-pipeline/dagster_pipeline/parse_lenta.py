@@ -1,19 +1,20 @@
 import os
 import requests
 from bs4 import BeautifulSoup
-from datetime import datetime
+from datetime import datetime, timedelta
 import pandas as pd
 from dotenv import load_dotenv
 
 # Загрузка переменных окружения из .env файла
 load_dotenv()
 
-def parse_lenta_news(days=1):
+def parse_lenta_news(start_date: datetime, end_date: datetime):
     """
-    Парсинг новостей с сайта Lenta.ru за указанное количество дней.
+    Парсинг новостей с сайта Lenta.ru за УКАЗАННЫЙ ПЕРИОД ДАТ (но текущая реализация парсит только главную!).
 
     Args:
-        days (int): Количество дней для парсинга (по умолчанию 1 - текущий день)
+        start_date (datetime): Начальная дата для парсинга (в этой реализации не используется).
+        end_date (datetime): Конечная дата для парсинга (в этой реализации не используется).
 
     Returns:
         pd.DataFrame: DataFrame с новостями
@@ -121,5 +122,10 @@ def get_full_news_content(url, headers):
         return "", datetime.now()
 
 if __name__ == "__main__":
-    df = parse_lenta_news()
+    # Пример использования: парсинг новостей за последние 1 день (по факту - только главная страница)
+    end_date_main = datetime.now()
+    start_date_main = end_date_main - timedelta(days=0) # Для примера, фактически даты не влияют на парсинг здесь
+    
+    print(f"Запуск Dagster-версии парсинга Lenta.ru (парсит только главную) с {start_date_main.strftime('%Y-%m-%d')} по {end_date_main.strftime('%Y-%m-%d')}")
+    df = parse_lenta_news(start_date_main, end_date_main)
     print(df.head())

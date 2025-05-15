@@ -301,7 +301,7 @@ def get_general_system_stats(current_user: dict = Depends(get_current_admin_user
 async def perform_clustering_task(task_id: str, request: ClusteringRequest, user_id: int, credits_cost: int):
     try:
         # Импортируем модули для парсинга
-        from data.parse_lenta import parse_lenta_news
+        from src import parse_lenta_news
         
         # Telegram парсер (в разработке, не используется по умолчанию)
         # from data.parse_tg import parse_forbes_news
@@ -309,7 +309,6 @@ async def perform_clustering_task(task_id: str, request: ClusteringRequest, user
         # Определяем период времени для анализа
         start_date = datetime.strptime(request.date_range.start_date, "%Y-%m-%d")
         end_date = datetime.strptime(request.date_range.end_date, "%Y-%m-%d")
-        days = (end_date - start_date).days + 1
         
         # Получаем пользовательскую конфигурацию моделей или дефолтные
         ml_config = request.ml_config or {}
@@ -321,52 +320,92 @@ async def perform_clustering_task(task_id: str, request: ClusteringRequest, user
         clustering_model_config = ml_config.get("clustering", default_models.get("clustering", {}).get("config", {}))
         
         # Получаем данные только из Lenta.ru
-        print(f"Загрузка новостей с Lenta.ru за {days} дней...")
+        print(f"Загрузка новостей с Lenta.ru за период с {start_date.strftime('%Y-%m-%d')} по {end_date.strftime('%Y-%m-%d')}...")
         lenta_news_future = asyncio.create_task(
-            asyncio.to_thread(lambda: parse_lenta_news(days=days))
+            asyncio.to_thread(lambda: parse_lenta_news(start_date=start_date, end_date=end_date))
         )
         
         # Ждем выполнения задачи
         lenta_df = await lenta_news_future
+
+        # Проверка и подготовка lenta_df
+        expected_cols_parser = ['title', 'text', 'date', 'url'] # Ожидаемые колонки от парсера
+        if lenta_df is None or not isinstance(lenta_df, pd.DataFrame):
+            print(f"Task {task_id}: Парсер Lenta.ru вернул None или не DataFrame. Создаем пустой DataFrame.")
+            lenta_df = pd.DataFrame(columns=expected_cols_parser)
+        
+        for col in expected_cols_parser:
+            if col not in lenta_df.columns:
+                print(f"Task {task_id}: В DataFrame от Lenta.ru отсутствует колонка: {col}. Добавляем пустой столбец.")
+                lenta_df[col] = pd.NA
         
         # Создаем пустой DataFrame для Forbes (Telegram) - в разработке
-        # Пример пустого DataFrame с такой же структурой как у lenta_df
-        forbes_df = pd.DataFrame(columns=lenta_df.columns)
+        # Используем уже проверенные и дополненные колонки из lenta_df
+        # Это гарантирует, что forbes_df будет иметь те же колонки, что и lenta_df на данном этапе
+        forbes_df = pd.DataFrame(columns=lenta_df.columns.tolist())
         forbes_df["source"] = "forbes (в разработке)"
         
-        # Опциональный парсинг Telegram (в разработке, закомментирован)
-        # print(f"Загрузка новостей из Telegram за {days} дней...")
-        # forbes_news_future = asyncio.create_task(
-        #     asyncio.to_thread(lambda: asyncio.run(parse_forbes_news(days=days)))
-        # )
-        # forbes_df = await forbes_news_future
-        # forbes_df = forbes_df.rename(columns={"text": "text", "date": "date"})
-        # forbes_df["source"] = "forbes"
-        
         # Подготавливаем данные Lenta.ru
-        lenta_df = lenta_df.rename(columns={"text": "text", "date": "date"})
+        # Переименование колонок text и date больше не нужно, если parse_lenta_news возвращает их корректно.
+        # lenta_df = lenta_df.rename(columns={"text": "text", "date": "date"}) # Закомментировано
         lenta_df["source"] = "lenta"
         
         # Объединение данных (включаем только Lenta.ru)
-        news_df = lenta_df
+        news_df = lenta_df # На данный момент news_df это копия lenta_df
         
         # Фильтруем по дате
-        news_df['date'] = pd.to_datetime(news_df['date'])
-        news_df = news_df[
-            (news_df['date'] >= start_date) &
-            (news_df['date'] <= end_date)
-        ]
+        # Колонки, которые должны быть в news_df после всех подготовок перед ML частью
+        final_expected_cols = expected_cols_parser + ['source', 'cleaned_text'] 
+
+        if not news_df.empty and 'date' in news_df.columns and not news_df['date'].isnull().all():
+            try:
+                # Убедимся, что start_date и end_date являются объектами date для сравнения с .dt.date
+                s_date = start_date.date() if isinstance(start_date, datetime) else start_date
+                e_date = end_date.date() if isinstance(end_date, datetime) else end_date
+                
+                news_df['date'] = pd.to_datetime(news_df['date'])
+                news_df = news_df[
+                    (news_df['date'].dt.date >= s_date) &
+                    (news_df['date'].dt.date <= e_date)
+                ]
+            except Exception as e_filter:
+                print(f"Task {task_id}: Ошибка при конвертации или фильтрации дат в news_df: {e_filter}. Создаем пустой DataFrame.")
+                news_df = pd.DataFrame(columns=final_expected_cols)
+        elif news_df.empty:
+            print(f"Task {task_id}: news_df пуст перед фильтрацией по дате. Убеждаемся, что он имеет правильные колонки.")
+            news_df = pd.DataFrame(columns=final_expected_cols) # Создаем пустой DataFrame с нужными колонками
+        else: # Колонка date отсутствует или вся NaN
+            print(f"Task {task_id}: Колонка 'date' отсутствует в news_df или полностью NaN перед фильтрацией. Создаем пустой DataFrame.")
+            news_df = pd.DataFrame(columns=final_expected_cols)
+
+        # Проверка на наличие данных после всех фильтраций
+        if news_df.empty: # Используем .empty для проверки DataFrame
+            error_message = f"Не найдено новостей в указанный период ({start_date.strftime('%Y-%m-%d')} - {end_date.strftime('%Y-%m-%d')}) после парсинга и всех фильтраций."
+            print(f"Task {task_id}: {error_message}")
+            save_clustering_result({
+                "id": task_id, "user_id": user_id, "status": "failed", 
+                "date_range": {"start_date": request.date_range.start_date, "end_date": request.date_range.end_date},
+                "error": error_message,
+                "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "ml_config": ml_config, # Сохраняем запрошенную конфигурацию
+                "credits_used": 0
+            })
+            return # Завершаем задачу, если нет данных
         
-        # Проверка на наличие данных
-        if len(news_df) == 0:
-            raise ValueError(f"Не найдено новостей в указанный период ({start_date} - {end_date})")
-        
-        print(f"Загружено {len(news_df)} новостей")
+        print(f"Task {task_id}: Загружено {len(news_df)} новостей после начальной фильтрации.")
         
         # Очистка текста
-        news_df['cleaned_text'] = news_df['text'].apply(clean_text)
+        if 'text' in news_df.columns:
+            news_df['cleaned_text'] = news_df['text'].apply(clean_text)
+        else:
+            print(f"Task {task_id}: Колонка 'text' отсутствует для очистки. Пропускаем.")
+            news_df['cleaned_text'] = "" # или pd.NA
         
         # Загрузка модели эмбеддингов с использованием пользовательской конфигурации
+        # Убедимся, что параметр method существует в конфигурации
+        if 'method' not in embedding_model_config:
+            embedding_model_config['method'] = 'sentence_transformer'  # Устанавливаем значение по умолчанию
+        
         embedding_model = EmbeddingModel(**embedding_model_config)
         
         # Создание эмбеддингов для текстов
