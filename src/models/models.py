@@ -39,11 +39,13 @@ class ClusteringResult(BaseModel):
     visualization_path: Optional[str] = None
     ml_config: Optional[Dict[str, Any]] = None
     credits_used: int = 10
+    progress: float = 0
 
 
 class ClusteringResponse(BaseModel):
     task_id: str
     status: str
+    progress: float = 0
 
 
 class UserCreate(BaseModel):

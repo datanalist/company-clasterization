@@ -61,7 +61,9 @@ from .database.database import (
     get_credit_history,
     get_math_problem,
     validate_math_solution,
-    get_user_by_id
+    get_user_by_id,
+    get_news_files_in_range,
+    update_clustering_progress
 )
 from .utils.auth import (
     get_password_hash,
@@ -144,6 +146,21 @@ async def start_clustering(
     # Создаем уникальный идентификатор для задачи
     task_id = str(uuid.uuid4())
     
+    # Сохраняем начальное состояние задачи
+    save_clustering_result({
+        "id": task_id,
+        "user_id": current_user["id"],
+        "status": "started",
+        "date_range": {
+            "start_date": request.date_range.start_date,
+            "end_date": request.date_range.end_date
+        },
+        "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "ml_config": request.ml_config,
+        "credits_used": 0,
+        "progress": 0
+    })
+    
     # Запускаем задачу кластеризации в фоновом режиме
     background_tasks.add_task(
         perform_clustering_task,
@@ -153,7 +170,7 @@ async def start_clustering(
         credits_cost=credits_cost  # Передаем стоимость задачи
     )
     
-    return {"task_id": task_id, "status": "started"}
+    return {"task_id": task_id, "status": "started", "progress": 0}
 
 @app.get("/api/clustering/results", response_model=List[ClusteringResult])
 def get_user_clustering_results(current_user: dict = Depends(get_current_user)):
@@ -298,10 +315,36 @@ def get_general_system_stats(current_user: dict = Depends(get_current_admin_user
     """Получает общую статистику использования системы (требуются права администратора)"""
     return get_system_stats()
 
+@app.get("/api/clustering/status/{task_id}", response_model=ClusteringResponse)
+def get_clustering_status(
+    task_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Получает текущий статус выполнения задачи кластеризации"""
+    result = get_clustering_result_by_id(task_id)
+    
+    if not result:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Задача не найдена"
+        )
+    
+    if result["user_id"] != current_user["id"]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Нет доступа к этой задаче"
+        )
+    
+    return {
+        "task_id": task_id,
+        "status": result["status"],
+        "progress": result.get("progress", 0)
+    }
+
 async def perform_clustering_task(task_id: str, request: ClusteringRequest, user_id: int, credits_cost: int):
     try:
         # Импортируем модули для парсинга
-        from src import parse_lenta_news
+        from src.data.parse_lenta import parse_lenta_news
         
         # Telegram парсер (в разработке, не используется по умолчанию)
         # from data.parse_tg import parse_forbes_news
@@ -309,6 +352,9 @@ async def perform_clustering_task(task_id: str, request: ClusteringRequest, user
         # Определяем период времени для анализа
         start_date = datetime.strptime(request.date_range.start_date, "%Y-%m-%d")
         end_date = datetime.strptime(request.date_range.end_date, "%Y-%m-%d")
+        
+        # Обновляем прогресс: 5% - начало работы
+        update_clustering_progress(task_id, 0.05)
         
         # Получаем пользовательскую конфигурацию моделей или дефолтные
         ml_config = request.ml_config or {}
@@ -319,14 +365,72 @@ async def perform_clustering_task(task_id: str, request: ClusteringRequest, user
         reduction_model_config = ml_config.get("reduction", default_models.get("reduction", {}).get("config", {}))
         clustering_model_config = ml_config.get("clustering", default_models.get("clustering", {}).get("config", {}))
         
-        # Получаем данные только из Lenta.ru
-        print(f"Загрузка новостей с Lenta.ru за период с {start_date.strftime('%Y-%m-%d')} по {end_date.strftime('%Y-%m-%d')}...")
-        lenta_news_future = asyncio.create_task(
-            asyncio.to_thread(lambda: parse_lenta_news(start_date=start_date, end_date=end_date))
-        )
+        # Обновляем прогресс: 10% - настройка моделей завершена
+        update_clustering_progress(task_id, 0.1)
         
-        # Ждем выполнения задачи
-        lenta_df = await lenta_news_future
+        # Проверяем наличие готовых файлов с новостями за указанный период
+        print(f"Проверяем наличие готовых файлов с новостями за период с {start_date.strftime('%Y-%m-%d')} по {end_date.strftime('%Y-%m-%d')}...")
+        existing_files = get_news_files_in_range("lenta", start_date, end_date)
+        
+        # Обновляем прогресс: 15% - проверка наличия файлов завершена
+        update_clustering_progress(task_id, 0.15)
+        
+        # Если есть все необходимые файлы, используем их
+        date_range = (end_date - start_date).days + 1
+        if len(existing_files) == date_range:
+            print(f"Найдены все необходимые файлы с новостями ({len(existing_files)} из {date_range}). Загружаем данные...")
+            
+            # Создаем пустой DataFrame для объединения данных
+            lenta_df = pd.DataFrame()
+            
+            # Загружаем данные из каждого файла
+            for i, file_info in enumerate(existing_files):
+                try:
+                    df = pd.read_csv(file_info["file_path"])
+                    if not df.empty:
+                        # Преобразуем даты
+                        if 'date' in df.columns:
+                            df['date'] = pd.to_datetime(df['date'])
+                        lenta_df = pd.concat([lenta_df, df], ignore_index=True)
+                    
+                    # Обновляем прогресс загрузки (от 15% до 40%)
+                    progress = 0.15 + (0.25 * ((i + 1) / len(existing_files)))
+                    update_clustering_progress(task_id, progress)
+                    
+                except Exception as e:
+                    print(f"Ошибка при загрузке данных из файла {file_info['file_path']}: {e}")
+            
+            print(f"Загружено {len(lenta_df)} новостей из существующих файлов")
+            
+            # Обновляем прогресс: 40% - загрузка данных завершена
+            update_clustering_progress(task_id, 0.4)
+        else:
+            # Получаем данные только из Lenta.ru через парсер
+            print(f"Не все файлы с новостями доступны ({len(existing_files)} из {date_range}). Запускаем парсер...")
+            
+            # Обновляем статус и прогресс: 15% - начало парсинга
+            update_clustering_progress(task_id, 0.15, "parsing")
+            
+            # Создаем обертку для отслеживания прогресса парсинга
+            async def parse_with_progress():
+                # Запускаем парсер в отдельном потоке
+                lenta_df = await asyncio.to_thread(
+                    lambda: parse_lenta_news(
+                        start_date=start_date, 
+                        end_date=end_date, 
+                        progress_callback=lambda progress: update_clustering_progress(
+                            task_id, 0.15 + (progress * 0.25)
+                        )
+                    )
+                )
+                return lenta_df
+            
+            # Запускаем парсер с отслеживанием прогресса
+            lenta_df = await parse_with_progress()
+            print(f"Парсер вернул {len(lenta_df)} новостей")
+            
+            # Обновляем прогресс: 40% - парсинг завершен
+            update_clustering_progress(task_id, 0.4)
 
         # Проверка и подготовка lenta_df
         expected_cols_parser = ['title', 'text', 'date', 'url'] # Ожидаемые колонки от парсера
@@ -352,6 +456,9 @@ async def perform_clustering_task(task_id: str, request: ClusteringRequest, user
         
         # Объединение данных (включаем только Lenta.ru)
         news_df = lenta_df # На данный момент news_df это копия lenta_df
+        
+        # Обновляем прогресс: 45% - подготовка данных завершена
+        update_clustering_progress(task_id, 0.45)
         
         # Фильтруем по дате
         # Колонки, которые должны быть в news_df после всех подготовок перед ML частью
@@ -388,11 +495,15 @@ async def perform_clustering_task(task_id: str, request: ClusteringRequest, user
                 "error": error_message,
                 "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                 "ml_config": ml_config, # Сохраняем запрошенную конфигурацию
-                "credits_used": 0
+                "credits_used": 0,
+                "progress": 1.0  # Завершено с ошибкой
             })
             return # Завершаем задачу, если нет данных
         
         print(f"Task {task_id}: Загружено {len(news_df)} новостей после начальной фильтрации.")
+        
+        # Обновляем прогресс: 50% - фильтрация данных завершена
+        update_clustering_progress(task_id, 0.5)
         
         # Очистка текста
         if 'text' in news_df.columns:
@@ -401,6 +512,9 @@ async def perform_clustering_task(task_id: str, request: ClusteringRequest, user
             print(f"Task {task_id}: Колонка 'text' отсутствует для очистки. Пропускаем.")
             news_df['cleaned_text'] = "" # или pd.NA
         
+        # Обновляем прогресс: 55% - очистка текста завершена
+        update_clustering_progress(task_id, 0.55)
+        
         # Загрузка модели эмбеддингов с использованием пользовательской конфигурации
         # Убедимся, что параметр method существует в конфигурации
         if 'method' not in embedding_model_config:
@@ -408,16 +522,28 @@ async def perform_clustering_task(task_id: str, request: ClusteringRequest, user
         
         embedding_model = EmbeddingModel(**embedding_model_config)
         
+        # Обновляем прогресс: 60% - загрузка модели эмбеддингов завершена
+        update_clustering_progress(task_id, 0.6)
+        
         # Создание эмбеддингов для текстов
         embeddings = embedding_model.encode(news_df['cleaned_text'].tolist())
+        
+        # Обновляем прогресс: 70% - создание эмбеддингов завершено
+        update_clustering_progress(task_id, 0.7)
         
         # Снижение размерности с использованием пользовательской конфигурации
         reduction_model = ReductionModel(**reduction_model_config)
         reduced_embeddings = reduction_model.fit_transform(embeddings)
         
+        # Обновляем прогресс: 75% - снижение размерности завершено
+        update_clustering_progress(task_id, 0.75)
+        
         # Кластеризация с использованием пользовательской конфигурации
         clustering_model = ClusteringModel(**clustering_model_config)
         clusters = clustering_model.fit_predict(reduced_embeddings)
+        
+        # Обновляем прогресс: 80% - кластеризация завершена
+        update_clustering_progress(task_id, 0.8)
         
         # Векторизатор для выделения ключевых слов
         vectorizer = VectorizerModel(
@@ -535,6 +661,9 @@ async def perform_clustering_task(task_id: str, request: ClusteringRequest, user
                 "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             }
         
+        # Обновляем прогресс: 90% - обработка кластеров завершена
+        update_clustering_progress(task_id, 0.9)
+        
         # Создаем визуализацию (для сохранения в файл)
         try:
             # Используем UMAP для снижения размерности до 2D для визуализации
@@ -566,6 +695,9 @@ async def perform_clustering_task(task_id: str, request: ClusteringRequest, user
                 
         except Exception as e:
             print(f"Ошибка при создании визуализации: {e}")
+        
+        # Обновляем прогресс: 95% - создание визуализации завершено
+        update_clustering_progress(task_id, 0.95)
         
         # Сохраняем информацию об использованных моделях
         used_ml_config = {
@@ -599,7 +731,8 @@ async def perform_clustering_task(task_id: str, request: ClusteringRequest, user
             "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "visualization_path": f"viz_{task_id}.json",
             "ml_config": used_ml_config,
-            "credits_used": credits_cost  # Используем переданное значение стоимости
+            "credits_used": credits_cost,  # Используем переданное значение стоимости
+            "progress": 1.0  # Завершено на 100%
         }
         
         save_clustering_result(result)
@@ -616,7 +749,8 @@ async def perform_clustering_task(task_id: str, request: ClusteringRequest, user
             },
             "error": str(e),
             "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "credits_used": 0  # При ошибке кредиты не списываются
+            "credits_used": 0,  # При ошибке кредиты не списываются
+            "progress": 1.0  # Завершено с ошибкой
         }
         save_clustering_result(error_result)
 

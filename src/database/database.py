@@ -19,11 +19,13 @@ def get_db_connection():
 
 
 def initialize_database():
-    """Инициализирует базу данных и создает необходимые таблицы, если они не существуют"""
-    conn = get_db_connection()
+    """
+    Инициализация базы данных (создание таблиц, если они не существуют)
+    """
+    conn = sqlite3.connect("database.db")
     cursor = conn.cursor()
     
-    # Таблица для пользователей
+    # Создание таблицы пользователей
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -31,11 +33,12 @@ def initialize_database():
         email TEXT UNIQUE NOT NULL,
         hashed_password TEXT NOT NULL,
         credits INTEGER DEFAULT 100,
-        created_at TEXT NOT NULL
+        is_admin BOOLEAN DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
     ''')
     
-    # Таблица для результатов кластеризации
+    # Создание таблицы результатов кластеризации
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS clustering_results (
         id TEXT PRIMARY KEY,
@@ -44,134 +47,144 @@ def initialize_database():
         date_range TEXT NOT NULL,
         clusters TEXT,
         error TEXT,
-        created_at TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         visualization_path TEXT,
         ml_config TEXT,
-        credits_used INTEGER DEFAULT 10,
+        credits_used INTEGER DEFAULT 0,
+        progress REAL DEFAULT 0,
         FOREIGN KEY (user_id) REFERENCES users (id)
     )
     ''')
     
-    # Таблица для ML-моделей
+    # Создание таблицы ML-моделей
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS ml_models (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
         type TEXT NOT NULL,
+        description TEXT,
         config TEXT NOT NULL,
-        is_default INTEGER DEFAULT 0,
-        created_at TEXT NOT NULL
+        is_default BOOLEAN DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
     ''')
     
-    # Таблица для пакетов кредитов
+    # Создание таблицы пакетов кредитов
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS credit_packages (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
+        description TEXT,
         credits INTEGER NOT NULL,
         price REAL NOT NULL,
-        description TEXT
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
     ''')
     
-    # Таблица для транзакций кредитов
+    # Создание таблицы покупок кредитов
     cursor.execute('''
-    CREATE TABLE IF NOT EXISTS credit_transactions (
+    CREATE TABLE IF NOT EXISTS credit_purchases (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        package_id INTEGER NOT NULL,
+        credits INTEGER NOT NULL,
+        price REAL NOT NULL,
+        payment_method TEXT NOT NULL,
+        status TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users (id),
+        FOREIGN KEY (package_id) REFERENCES credit_packages (id)
+    )
+    ''')
+    
+    # Создание таблицы истории кредитов
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS credit_history (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id INTEGER NOT NULL,
         amount INTEGER NOT NULL,
+        balance_after INTEGER NOT NULL,
         transaction_type TEXT NOT NULL,
         description TEXT,
-        created_at TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (user_id) REFERENCES users (id)
     )
     ''')
     
-    # Таблица для математических задач
+    # Создание таблицы математических задач
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS math_problems (
         id TEXT PRIMARY KEY,
         problem TEXT NOT NULL,
-        answer REAL NOT NULL,
-        created_at TEXT NOT NULL,
-        expires_at TEXT NOT NULL,
-        used INTEGER DEFAULT 0
+        answer TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        solved_by INTEGER,
+        solved_at TIMESTAMP,
+        FOREIGN KEY (solved_by) REFERENCES users (id)
     )
     ''')
     
-    # Добавляем дефолтные пакеты кредитов, если их нет
-    cursor.execute('SELECT COUNT(*) FROM credit_packages')
-    if cursor.fetchone()[0] == 0:
-        cursor.executemany('''
-        INSERT INTO credit_packages (name, credits, price, description)
-        VALUES (?, ?, ?, ?)
-        ''', [
-            ("Стартовый", 100, 5.99, "Базовый пакет для начала работы"),
-            ("Стандартный", 500, 19.99, "Оптимальный выбор для регулярного использования"),
-            ("Премиум", 1000, 29.99, "Выгодное предложение для активных пользователей"),
-            ("Бизнес", 5000, 99.99, "Решение для бизнеса с большим объемом данных")
-        ])
+    # Создание таблицы новостных файлов
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS news_files (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        source TEXT NOT NULL,
+        file_path TEXT NOT NULL,
+        news_date DATE NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        news_count INTEGER DEFAULT 0,
+        status TEXT DEFAULT 'ready',
+        metadata TEXT,
+        UNIQUE(source, news_date)
+    )
+    ''')
     
-    # Добавляем дефолтные ML-модели, если их нет
-    cursor.execute('SELECT COUNT(*) FROM ml_models')
-    if cursor.fetchone()[0] == 0:
-        # Embedding модели
-        cursor.execute('''
-        INSERT INTO ml_models (name, type, config, is_default, created_at)
-        VALUES (?, ?, ?, ?, ?)
-        ''', (
-            "LaBSE",
-            "embedding",
-            json.dumps({
-                "model_name": "sentence-transformers/LaBSE",
-                "max_length": 128
-            }),
-            1,  # Дефолтная модель
-            datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        ))
-        
-        # Reduction модели
-        cursor.execute('''
-        INSERT INTO ml_models (name, type, config, is_default, created_at)
-        VALUES (?, ?, ?, ?, ?)
-        ''', (
-            "UMAP",
-            "reduction",
-            json.dumps({
-                "method": "umap",
-                "n_neighbors": 15,
-                "n_components": 5,
-                "min_dist": 0.1,
-                "metric": "euclidean"
-            }),
-            1,  # Дефолтная модель
-            datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        ))
-        
-        # Clustering модели
-        cursor.execute('''
-        INSERT INTO ml_models (name, type, config, is_default, created_at)
-        VALUES (?, ?, ?, ?, ?)
-        ''', (
-            "HDBSCAN",
-            "clustering",
-            json.dumps({
-                "method": "hdbscan",
-                "min_cluster_size": 5,
-                "min_samples": 3,
-                "cluster_selection_epsilon": 0.5
-            }),
-            1,  # Дефолтная модель
-            datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        ))
+    # Создание индекса для быстрого поиска файлов по дате и источнику
+    cursor.execute('''
+    CREATE INDEX IF NOT EXISTS idx_news_files_date_source ON news_files (news_date, source)
+    ''')
+    
+    # Вставка дефолтных ML-моделей, если их нет
+    add_default_ml_models(cursor)
+    
+    # Вставка дефолтных пакетов кредитов, если их нет
+    add_default_credit_packages(cursor)
     
     conn.commit()
-    
-    # Проверяем необходимость миграции
-    migrate_database_schema()
-    
     conn.close()
+    
+    # Выполняем миграцию для добавления колонки progress, если она не существует
+    add_progress_column_if_not_exists()
+
+
+def add_progress_column_if_not_exists():
+    """
+    Добавляет колонку progress в таблицу clustering_results, если она не существует
+    """
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    try:
+        # Проверяем существование колонки progress
+        cursor.execute("PRAGMA table_info(clustering_results)")
+        columns = cursor.fetchall()
+        column_names = [column[1] for column in columns]
+        
+        # Если колонки progress нет, добавляем ее
+        if "progress" not in column_names:
+            print("Добавление колонки progress в таблицу clustering_results...")
+            cursor.execute('''
+            ALTER TABLE clustering_results ADD COLUMN progress REAL DEFAULT 0
+            ''')
+            conn.commit()
+            print("Колонка progress успешно добавлена")
+        
+    except Exception as e:
+        print(f"Ошибка при добавлении колонки progress: {e}")
+        conn.rollback()
+    finally:
+        conn.close()
 
 
 def migrate_database_schema():
@@ -315,27 +328,53 @@ def save_clustering_result(result: dict) -> bool:
     conn = get_db_connection()
     cursor = conn.cursor()
     
+    # Проверяем, существует ли колонка progress
+    cursor.execute("PRAGMA table_info(clustering_results)")
+    columns = cursor.fetchall()
+    column_names = [column[1] for column in columns]
+    has_progress_column = "progress" in column_names
+    
     # Сериализуем JSON-поля
     date_range_json = json.dumps(result["date_range"])
     clusters_json = json.dumps(result.get("clusters", None))
     ml_config_json = json.dumps(result.get("ml_config", None))
     
-    cursor.execute('''
-    INSERT INTO clustering_results
-    (id, user_id, status, date_range, clusters, error, created_at, visualization_path, ml_config, credits_used)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    ''', (
-        result["id"],
-        result["user_id"],
-        result["status"],
-        date_range_json,
-        clusters_json,
-        result.get("error", None),
-        result["created_at"],
-        result.get("visualization_path", None),
-        ml_config_json,
-        result.get("credits_used", 10)
-    ))
+    # Формируем запрос в зависимости от наличия колонки progress
+    if has_progress_column:
+        cursor.execute('''
+        INSERT INTO clustering_results
+        (id, user_id, status, date_range, clusters, error, created_at, visualization_path, ml_config, credits_used, progress)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (
+            result["id"],
+            result["user_id"],
+            result["status"],
+            date_range_json,
+            clusters_json,
+            result.get("error", None),
+            result["created_at"],
+            result.get("visualization_path", None),
+            ml_config_json,
+            result.get("credits_used", 10),
+            result.get("progress", 0)
+        ))
+    else:
+        cursor.execute('''
+        INSERT INTO clustering_results
+        (id, user_id, status, date_range, clusters, error, created_at, visualization_path, ml_config, credits_used)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (
+            result["id"],
+            result["user_id"],
+            result["status"],
+            date_range_json,
+            clusters_json,
+            result.get("error", None),
+            result["created_at"],
+            result.get("visualization_path", None),
+            ml_config_json,
+            result.get("credits_used", 10)
+        ))
     
     conn.commit()
     conn.close()
@@ -367,6 +406,9 @@ def get_clustering_results(user_id: int) -> List[dict]:
         
     if "credits_used" in column_names:
         select_fields.append("credits_used")
+    
+    if "progress" in column_names:
+        select_fields.append("progress")
     
     fields_str = ", ".join(select_fields)
     
@@ -400,6 +442,10 @@ def get_clustering_results(user_id: int) -> List[dict]:
         # Если credits_used отсутствует, устанавливаем значение по умолчанию
         if "credits_used" not in result_dict:
             result_dict["credits_used"] = 10
+        
+        # Если progress отсутствует, устанавливаем значение по умолчанию
+        if "progress" not in result_dict:
+            result_dict["progress"] = 0
             
         processed_results.append(result_dict)
     
@@ -431,6 +477,9 @@ def get_clustering_result_by_id(result_id: str) -> Optional[dict]:
         
     if "credits_used" in column_names:
         select_fields.append("credits_used")
+    
+    if "progress" in column_names:
+        select_fields.append("progress")
     
     fields_str = ", ".join(select_fields)
     
@@ -464,6 +513,10 @@ def get_clustering_result_by_id(result_id: str) -> Optional[dict]:
     # Если credits_used отсутствует, устанавливаем значение по умолчанию
     if "credits_used" not in result_dict:
         result_dict["credits_used"] = 10
+    
+    # Если progress отсутствует, устанавливаем значение по умолчанию
+    if "progress" not in result_dict:
+        result_dict["progress"] = 0
     
     return result_dict
 
@@ -815,7 +868,7 @@ def save_math_problem(problem: str) -> dict:
     CREATE TABLE IF NOT EXISTS math_problems (
         id TEXT PRIMARY KEY,
         problem TEXT NOT NULL,
-        answer REAL NOT NULL,
+        answer TEXT NOT NULL,
         created_at TEXT NOT NULL,
         expires_at TEXT NOT NULL,
         used INTEGER DEFAULT 0
@@ -960,4 +1013,349 @@ def validate_math_solution(problem_id: str, user_answer: float, user_id: int) ->
             
     except Exception as e:
         print(f"Ошибка в validate_math_solution: {e}")
-        return False, f"Произошла ошибка: {str(e)}" 
+        return False, f"Произошла ошибка: {str(e)}"
+
+
+def get_news_file(source, news_date):
+    """
+    Получает информацию о файле с новостями за указанную дату и из указанного источника
+    
+    Args:
+        source (str): Источник новостей (например, "lenta")
+        news_date (str или datetime): Дата новостей в формате YYYY-MM-DD или объект datetime
+        
+    Returns:
+        dict или None: Информация о файле или None, если файл не найден
+    """
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # Преобразуем date в строку, если это объект datetime
+    if hasattr(news_date, 'strftime'):
+        news_date = news_date.strftime('%Y-%m-%d')
+    
+    cursor.execute(
+        "SELECT id, source, file_path, news_date, created_at, updated_at, news_count, status, metadata FROM news_files WHERE source = ? AND news_date = ?",
+        (source, news_date)
+    )
+    
+    file_data = cursor.fetchone()
+    conn.close()
+    
+    if file_data:
+        return {
+            "id": file_data[0],
+            "source": file_data[1],
+            "file_path": file_data[2],
+            "news_date": file_data[3],
+            "created_at": file_data[4],
+            "updated_at": file_data[5],
+            "news_count": file_data[6],
+            "status": file_data[7],
+            "metadata": json.loads(file_data[8]) if file_data[8] else {}
+        }
+    
+    return None
+
+
+def save_news_file(source, news_date, file_path, news_count, status="ready", metadata=None):
+    """
+    Сохраняет информацию о файле с новостями в базу данных
+    
+    Args:
+        source (str): Источник новостей (например, "lenta")
+        news_date (str или datetime): Дата новостей в формате YYYY-MM-DD или объект datetime
+        file_path (str): Путь к файлу с новостями
+        news_count (int): Количество новостей в файле
+        status (str): Статус файла ("ready", "parsing", "error")
+        metadata (dict): Дополнительная информация о файле
+        
+    Returns:
+        bool: True, если файл был успешно сохранен, False в противном случае
+    """
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # Преобразуем date в строку, если это объект datetime
+    if hasattr(news_date, 'strftime'):
+        news_date = news_date.strftime('%Y-%m-%d')
+    
+    # Преобразуем metadata в JSON, если он не None
+    metadata_json = json.dumps(metadata) if metadata else None
+    
+    try:
+        # Проверяем, существует ли уже запись для этой даты и источника
+        cursor.execute(
+            "SELECT id FROM news_files WHERE source = ? AND news_date = ?",
+            (source, news_date)
+        )
+        
+        existing_file = cursor.fetchone()
+        
+        if existing_file:
+            # Обновляем существующую запись
+            cursor.execute(
+                """
+                UPDATE news_files 
+                SET file_path = ?, updated_at = CURRENT_TIMESTAMP, news_count = ?, status = ?, metadata = ?
+                WHERE id = ?
+                """,
+                (file_path, news_count, status, metadata_json, existing_file[0])
+            )
+        else:
+            # Создаем новую запись
+            cursor.execute(
+                """
+                INSERT INTO news_files (source, news_date, file_path, news_count, status, metadata)
+                VALUES (?, ?, ?, ?, ?, ?)
+                """,
+                (source, news_date, file_path, news_count, status, metadata_json)
+            )
+        
+        conn.commit()
+        conn.close()
+        return True
+        
+    except Exception as e:
+        print(f"Ошибка при сохранении информации о файле новостей: {e}")
+        conn.rollback()
+        conn.close()
+        return False
+
+
+def get_news_files_in_range(source, start_date, end_date):
+    """
+    Получает информацию о файлах с новостями за указанный период из указанного источника
+    
+    Args:
+        source (str): Источник новостей (например, "lenta")
+        start_date (str или datetime): Начальная дата в формате YYYY-MM-DD или объект datetime
+        end_date (str или datetime): Конечная дата в формате YYYY-MM-DD или объект datetime
+        
+    Returns:
+        list: Список файлов с новостями за указанный период
+    """
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # Преобразуем даты в строки, если это объекты datetime
+    if hasattr(start_date, 'strftime'):
+        start_date = start_date.strftime('%Y-%m-%d')
+    
+    if hasattr(end_date, 'strftime'):
+        end_date = end_date.strftime('%Y-%m-%d')
+    
+    cursor.execute(
+        """
+        SELECT id, source, file_path, news_date, created_at, updated_at, news_count, status, metadata 
+        FROM news_files 
+        WHERE source = ? AND news_date BETWEEN ? AND ? AND status = 'ready'
+        ORDER BY news_date ASC
+        """,
+        (source, start_date, end_date)
+    )
+    
+    files_data = cursor.fetchall()
+    conn.close()
+    
+    files = []
+    for file_data in files_data:
+        files.append({
+            "id": file_data[0],
+            "source": file_data[1],
+            "file_path": file_data[2],
+            "news_date": file_data[3],
+            "created_at": file_data[4],
+            "updated_at": file_data[5],
+            "news_count": file_data[6],
+            "status": file_data[7],
+            "metadata": json.loads(file_data[8]) if file_data[8] else {}
+        })
+    
+    return files
+
+
+def update_news_file_status(file_id, status, metadata=None):
+    """
+    Обновляет статус и метаданные файла с новостями
+    
+    Args:
+        file_id (int): ID файла
+        status (str): Новый статус файла
+        metadata (dict): Новые метаданные файла (опционально)
+        
+    Returns:
+        bool: True, если статус был успешно обновлен, False в противном случае
+    """
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    try:
+        if metadata is not None:
+            metadata_json = json.dumps(metadata)
+            cursor.execute(
+                """
+                UPDATE news_files 
+                SET status = ?, metadata = ?, updated_at = CURRENT_TIMESTAMP
+                WHERE id = ?
+                """,
+                (status, metadata_json, file_id)
+            )
+        else:
+            cursor.execute(
+                """
+                UPDATE news_files 
+                SET status = ?, updated_at = CURRENT_TIMESTAMP
+                WHERE id = ?
+                """,
+                (status, file_id)
+            )
+        
+        conn.commit()
+        conn.close()
+        return True
+        
+    except Exception as e:
+        print(f"Ошибка при обновлении статуса файла новостей: {e}")
+        conn.rollback()
+        conn.close()
+        return False
+
+
+def add_default_ml_models(cursor):
+    """
+    Добавляет дефолтные ML-модели в базу данных, если их нет
+    
+    Args:
+        cursor: Курсор базы данных
+    """
+    # Проверяем, есть ли уже модели в базе
+    cursor.execute('SELECT COUNT(*) FROM ml_models')
+    if cursor.fetchone()[0] > 0:
+        return
+    
+    # Embedding модели
+    cursor.execute('''
+    INSERT INTO ml_models (name, type, description, config, is_default, created_at)
+    VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+    ''', (
+        "LaBSE",
+        "embedding",
+        "Модель для создания многоязычных эмбеддингов текста",
+        json.dumps({
+            "method": "sentence_transformer",
+            "model_name_or_path": "sentence-transformers/LaBSE",
+            "max_length": 128
+        }),
+        1  # Дефолтная модель
+    ))
+    
+    # Reduction модели
+    cursor.execute('''
+    INSERT INTO ml_models (name, type, description, config, is_default, created_at)
+    VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+    ''', (
+        "UMAP",
+        "reduction",
+        "Алгоритм снижения размерности данных",
+        json.dumps({
+            "method": "umap",
+            "n_neighbors": 15,
+            "n_components": 5,
+            "min_dist": 0.1,
+            "metric": "euclidean"
+        }),
+        1  # Дефолтная модель
+    ))
+    
+    # Clustering модели
+    cursor.execute('''
+    INSERT INTO ml_models (name, type, description, config, is_default, created_at)
+    VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+    ''', (
+        "HDBSCAN",
+        "clustering",
+        "Алгоритм кластеризации на основе плотности",
+        json.dumps({
+            "model_name": "hdbscan",
+            "min_cluster_size": 5,
+            "min_samples": 3,
+            "cluster_selection_epsilon": 0.5
+        }),
+        1  # Дефолтная модель
+    ))
+
+
+def add_default_credit_packages(cursor):
+    """
+    Добавляет дефолтные пакеты кредитов в базу данных, если их нет
+    
+    Args:
+        cursor: Курсор базы данных
+    """
+    # Проверяем, есть ли уже пакеты в базе
+    cursor.execute('SELECT COUNT(*) FROM credit_packages')
+    if cursor.fetchone()[0] > 0:
+        return
+    
+    # Добавляем пакеты
+    cursor.executemany('''
+    INSERT INTO credit_packages (name, credits, price, description, created_at)
+    VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
+    ''', [
+        ("Стартовый", 100, 5.99, "Базовый пакет для начала работы"),
+        ("Стандартный", 500, 19.99, "Оптимальный выбор для регулярного использования"),
+        ("Премиум", 1000, 29.99, "Выгодное предложение для активных пользователей"),
+        ("Бизнес", 5000, 99.99, "Решение для бизнеса с большим объемом данных")
+    ])
+
+
+def update_clustering_progress(task_id: str, progress: float, status: str = None) -> bool:
+    """Обновляет прогресс и, опционально, статус задачи кластеризации
+    
+    Args:
+        task_id (str): ID задачи кластеризации
+        progress (float): Прогресс выполнения от 0 до 1
+        status (str, optional): Новый статус задачи, если требуется обновить
+        
+    Returns:
+        bool: True, если обновление прошло успешно, False в случае ошибки
+    """
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    try:
+        # Проверяем, существует ли колонка progress
+        cursor.execute("PRAGMA table_info(clustering_results)")
+        columns = cursor.fetchall()
+        column_names = [column[1] for column in columns]
+        has_progress_column = "progress" in column_names
+        
+        # Если колонки progress нет, добавляем ее
+        if not has_progress_column:
+            cursor.execute('''
+            ALTER TABLE clustering_results ADD COLUMN progress REAL DEFAULT 0
+            ''')
+            conn.commit()
+        
+        if status:
+            cursor.execute('''
+            UPDATE clustering_results
+            SET progress = ?, status = ?
+            WHERE id = ?
+            ''', (progress, status, task_id))
+        else:
+            cursor.execute('''
+            UPDATE clustering_results
+            SET progress = ?
+            WHERE id = ?
+            ''', (progress, task_id))
+        
+        conn.commit()
+        conn.close()
+        return True
+    except Exception as e:
+        print(f"Ошибка при обновлении прогресса задачи: {e}")
+        conn.rollback()
+        conn.close()
+        return False 

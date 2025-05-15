@@ -8,6 +8,14 @@ import concurrent.futures
 from tqdm import tqdm
 import time
 import threading
+import sys
+import json
+
+# Добавляем путь к корневому каталогу проекта
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+
+# Импортируем функции для работы с таблицей новостных файлов
+from src.database.database import get_news_file, save_news_file, update_news_file_status
 
 # Загрузка переменных окружения из .env файла
 load_dotenv()
@@ -26,24 +34,66 @@ def safe_print(message):
         print(message)
 
 
-def parse_date(current_date, start_date, end_date, headers, progress=None):
+def parse_date(current_date, headers, progress=None):
     """
     Парсинг новостей с сайта Lenta.ru за конкретную дату.
     Эта функция будет выполняться в отдельном потоке для каждой даты.
 
     Args:
         current_date (datetime): Дата для парсинга
-        start_date (datetime): Начальная дата диапазона (для фильтрации)
-        end_date (datetime): Конечная дата диапазона (для фильтрации)
         headers (dict): Заголовки для HTTP-запроса
         progress (tqdm): Объект прогресс-бара для обновления
 
     Returns:
         list: Список новостей за указанную дату
+        str: Путь к сохраненному CSV-файлу
     """
     date_results = []
     
     try:
+        # Проверяем, есть ли уже файл с новостями за эту дату
+        news_file = get_news_file("lenta", current_date)
+        
+        # Если файл существует и его статус "ready", просто возвращаем путь к файлу
+        if news_file and news_file["status"] == "ready":
+            safe_print(f"Найден существующий файл с новостями за {current_date.strftime('%Y-%m-%d')}: {news_file['file_path']}")
+            
+            # Обновляем прогресс-бар
+            if progress:
+                progress.update(1)
+            
+            # Возвращаем пустой список (данные будут загружены из файла) и путь к файлу
+            return [], news_file["file_path"]
+        
+        # Если файл находится в процессе парсинга, возвращаем ошибку
+        if news_file and news_file["status"] == "parsing":
+            safe_print(f"Файл с новостями за {current_date.strftime('%Y-%m-%d')} в процессе парсинга другим процессом")
+            
+            # Обновляем прогресс-бар
+            if progress:
+                progress.update(1)
+            
+            return [], None
+        
+        # Если файл существует, но его статус "error", или файла нет, начинаем парсинг
+        if news_file:
+            # Обновляем статус на "parsing"
+            update_news_file_status(news_file["id"], "parsing")
+            file_id = news_file["id"]
+        else:
+            # Создаем новую запись в базе данных
+            output_filename = f"./data/raw/lenta-news_{current_date.strftime('%Y%m%d')}.csv"
+            save_news_file(
+                source="lenta",
+                news_date=current_date,
+                file_path=output_filename,
+                news_count=0,
+                status="parsing"
+            )
+            # Получаем созданную запись
+            news_file = get_news_file("lenta", current_date)
+            file_id = news_file["id"]
+        
         date_str_for_url = current_date.strftime('%Y/%m/%d')
         url_for_date = f"https://lenta.ru/{date_str_for_url}/" # Новый, подтвержденный формат URL
 
@@ -73,7 +123,14 @@ def parse_date(current_date, start_date, end_date, headers, progress=None):
                         safe_print(f"Ошибка при проверке альтернативного URL {alt_url}: {e}")
                 
                 if not found_alternative:
-                    return []  # Переход к следующей дате
+                    # Обновляем статус на "error"
+                    update_news_file_status(file_id, "error", {"error": "Страница не найдена для всех проверенных URL"})
+                    
+                    # Обновляем прогресс-бар
+                    if progress:
+                        progress.update(1)
+                        
+                    return [], None  # Переход к следующей дате
             
             response.raise_for_status()
             soup = BeautifulSoup(response.text, "html.parser")
@@ -159,6 +216,31 @@ def parse_date(current_date, start_date, end_date, headers, progress=None):
 
             if not news_blocks:
                 safe_print(f"После всех попыток не найдено новостных блоков для даты {current_date.strftime('%Y-%m-%d')}.")
+                # Обновляем статус на "ready", но с метаданными о том, что новостей нет
+                update_news_file_status(file_id, "ready", {"note": "Новости не найдены", "news_count": 0})
+                
+                # Создаем пустой CSV для этой даты
+                output_filename = f"./data/raw/lenta-news_{current_date.strftime('%Y%m%d')}.csv"
+                # Создаем пустой DataFrame с нужными колонками
+                empty_df = pd.DataFrame(columns=["title", "text", "date", "url"])
+                os.makedirs(os.path.dirname(output_filename), exist_ok=True)
+                empty_df.to_csv(output_filename, index=False, encoding='utf-8')
+                
+                # Обновляем информацию о файле
+                save_news_file(
+                    source="lenta",
+                    news_date=current_date,
+                    file_path=output_filename,
+                    news_count=0,
+                    status="ready",
+                    metadata={"note": "Новости не найдены"}
+                )
+                
+                # Обновляем прогресс-бар
+                if progress:
+                    progress.update(1)
+                
+                return [], output_filename
             
             for block in news_blocks:
                 try:
@@ -210,13 +292,9 @@ def parse_date(current_date, start_date, end_date, headers, progress=None):
                         else:
                             news_text = "Не удалось загрузить текст статьи"
 
-                    # Проверка, что новость относится к текущему дню (на случай, если на странице даты есть новости за другие дни)
+                    # Проверка, что новость относится к текущему дню
                     if news_date_obj.date() != current_date.date():
-                        # Проверим, что дата новости в пределах запрошенного диапазона дат
-                        if start_date.date() <= news_date_obj.date() <= end_date.date():
-                            pass  # Оставляем новость, если она в запрошенном диапазоне
-                        else:
-                            continue  # Пропускаем новости вне диапазона
+                        continue  # Пропускаем новости с неправильной датой
 
                     date_results.append(
                         {
@@ -232,35 +310,102 @@ def parse_date(current_date, start_date, end_date, headers, progress=None):
             
             safe_print(f"Завершили обработку даты {current_date.strftime('%Y-%m-%d')}. Собрано {len(date_results)} новостей.")
 
+            # Сохраняем новости в CSV файл
+            if date_results:
+                df = pd.DataFrame(date_results)
+                # Убедимся, что все ожидаемые колонки присутствуют
+                expected_columns = ["title", "text", "date", "url"]
+                for col in expected_columns:
+                    if col not in df.columns:
+                        df[col] = pd.NA
+                
+                # Преобразуем даты
+                if 'date' in df.columns and not df['date'].empty:
+                    df['date'] = pd.to_datetime(df['date']).dt.tz_localize(None)
+                
+                # Формируем путь к файлу
+                output_filename = f"./data/raw/lenta-news_{current_date.strftime('%Y%m%d')}.csv"
+                os.makedirs(os.path.dirname(output_filename), exist_ok=True)
+                
+                # Сохраняем файл
+                df.to_csv(output_filename, index=False, encoding='utf-8')
+                
+                # Обновляем запись в базе данных
+                save_news_file(
+                    source="lenta",
+                    news_date=current_date,
+                    file_path=output_filename,
+                    news_count=len(df),
+                    status="ready"
+                )
+                
+                safe_print(f"Сохранены новости за {current_date.strftime('%Y-%m-%d')} в файл {output_filename}")
+            else:
+                # Создаем пустой CSV с нужной структурой
+                output_filename = f"./data/raw/lenta-news_{current_date.strftime('%Y%m%d')}.csv"
+                empty_df = pd.DataFrame(columns=["title", "text", "date", "url"])
+                os.makedirs(os.path.dirname(output_filename), exist_ok=True)
+                empty_df.to_csv(output_filename, index=False, encoding='utf-8')
+                
+                # Обновляем запись в базе данных
+                save_news_file(
+                    source="lenta",
+                    news_date=current_date,
+                    file_path=output_filename,
+                    news_count=0,
+                    status="ready",
+                    metadata={"note": "Новости не найдены"}
+                )
+                
+                safe_print(f"Создан пустой файл для даты {current_date.strftime('%Y-%m-%d')}: {output_filename}")
+
         except requests.exceptions.RequestException as e:
             safe_print(f"Ошибка HTTP-запроса для даты {current_date.strftime('%Y-%m-%d')} ({url_for_date}): {e}")
+            # Обновляем статус на "error"
+            update_news_file_status(file_id, "error", {"error": str(e)})
+            
+            # Возвращаем пустой список и None вместо пути к файлу
+            if progress:
+                progress.update(1)
+            return [], None
+            
         except Exception as e:
             safe_print(f"Произошла ошибка при парсинге Lenta.ru для даты {current_date.strftime('%Y-%m-%d')}: {e}")
+            # Обновляем статус на "error"
+            update_news_file_status(file_id, "error", {"error": str(e)})
+            
+            # Возвращаем пустой список и None вместо пути к файлу
+            if progress:
+                progress.update(1)
+            return [], None
         
         # Обновляем прогресс-бар
         if progress:
             progress.update(1)
         
-        return date_results
+        return date_results, output_filename
         
     except Exception as e:
         safe_print(f"Критическая ошибка при обработке даты {current_date.strftime('%Y-%m-%d')}: {e}")
         if progress:
             progress.update(1)
-        return []
+        return [], None
 
 
-def parse_lenta_news(start_date: datetime, end_date: datetime, max_workers=10):
+def parse_lenta_news(start_date: datetime, end_date: datetime, max_workers=10, progress_callback=None):
     """
     Парсинг новостей с сайта Lenta.ru за указанный период дат с использованием многопоточности.
+    Каждая дата обрабатывается в отдельном потоке и сохраняется в отдельный CSV файл.
 
     Args:
         start_date (datetime): Начальная дата для парсинга.
         end_date (datetime): Конечная дата для парсинга.
         max_workers (int): Максимальное количество потоков.
+        progress_callback (callable, optional): Функция обратного вызова для отслеживания прогресса. 
+            Принимает один аргумент - значение прогресса от 0 до 1.
 
     Returns:
-        pd.DataFrame: DataFrame с новостями
+        pd.DataFrame: DataFrame с новостями за весь период
     """
     # Заголовки для имитации браузера
     headers = {
@@ -275,12 +420,25 @@ def parse_lenta_news(start_date: datetime, end_date: datetime, max_workers=10):
         current_date += timedelta(days=1)
     
     all_news_data = []
+    successful_file_paths = []
     
     # Показываем индикатор прогресса
     print(f"Начинаем многопоточный парсинг Lenta.ru за период с {start_date.strftime('%Y-%m-%d')} по {end_date.strftime('%Y-%m-%d')}")
     print(f"Количество дат для обработки: {len(date_range)}")
     print(f"Используем до {max_workers} параллельных потоков")
     print("Начинаем парсинг, это может занять некоторое время...")
+    
+    # Счетчик для отслеживания прогресса
+    processed_dates = 0
+    total_dates = len(date_range)
+    
+    # Функция для обновления прогресса
+    def update_progress():
+        nonlocal processed_dates
+        processed_dates += 1
+        if progress_callback:
+            progress = processed_dates / total_dates
+            progress_callback(progress)
     
     # Создаем прогресс-бар с общим количеством дат для обработки
     with tqdm(total=len(date_range), desc="Парсинг дат", unit="дата") as progress:
@@ -289,7 +447,7 @@ def parse_lenta_news(start_date: datetime, end_date: datetime, max_workers=10):
             # Создаем список задач - по одной задаче на каждую дату
             futures = {
                 executor.submit(
-                    parse_date, date, start_date, end_date, headers, progress
+                    parse_date, date, headers, progress
                 ): date for date in date_range
             }
             
@@ -297,70 +455,91 @@ def parse_lenta_news(start_date: datetime, end_date: datetime, max_workers=10):
             for future in concurrent.futures.as_completed(futures):
                 date = futures[future]
                 try:
-                    date_results = future.result()
+                    date_results, file_path = future.result()
+                    if file_path:
+                        successful_file_paths.append(file_path)
                     if date_results:
                         all_news_data.extend(date_results)
+                    
+                    # Обновляем счетчик прогресса
+                    update_progress()
+                    
                 except Exception as e:
                     safe_print(f"Ошибка при получении результатов для даты {date.strftime('%Y-%m-%d')}: {e}")
+                    # Даже при ошибке мы считаем дату обработанной для прогресс-бара
+                    update_progress()
 
-    # Обработка результатов
-    expected_columns = ["title", "text", "date", "url"]
-
-    if not all_news_data: 
-        safe_print(f"Не найдено новостей с Lenta.ru (all_news_data пуст) за период с {start_date.strftime('%Y-%m-%d')} по {end_date.strftime('%Y-%m-%d')}")
-        df = pd.DataFrame(columns=expected_columns)
-    else:
+    # Если у нас есть успешно обработанные файлы, загружаем данные из них
+    if successful_file_paths:
+        safe_print(f"Загружаем данные из {len(successful_file_paths)} успешно обработанных файлов")
+        
+        # Создаем пустой DataFrame для объединения данных
+        df_combined = pd.DataFrame()
+        
+        # Загружаем данные из каждого файла и объединяем их
+        for i, file_path in enumerate(successful_file_paths):
+            try:
+                df = pd.read_csv(file_path)
+                if not df.empty:
+                    # Преобразуем даты
+                    if 'date' in df.columns:
+                        df['date'] = pd.to_datetime(df['date'])
+                    df_combined = pd.concat([df_combined, df], ignore_index=True)
+                
+                # Обновляем прогресс загрузки
+                if progress_callback:
+                    load_progress = (i + 1) / len(successful_file_paths)
+                    progress_callback(0.8 + (load_progress * 0.2))  # От 80% до 100%
+                    
+            except Exception as e:
+                safe_print(f"Ошибка при загрузке данных из файла {file_path}: {e}")
+        
+        # Фильтруем по датам, чтобы точно получить только нужный диапазон
+        if not df_combined.empty and 'date' in df_combined.columns:
+            df_combined = df_combined[
+                (df_combined['date'].dt.date >= start_date.date()) & 
+                (df_combined['date'].dt.date <= end_date.date())
+            ]
+        
+        # Удаляем дубликаты
+        if not df_combined.empty and 'url' in df_combined.columns:
+            df_combined = df_combined.drop_duplicates(subset=['url'], keep='first').reset_index(drop=True)
+        
+        safe_print(f"Всего загружено {len(df_combined)} новостей за период с {start_date.strftime('%Y-%m-%d')} по {end_date.strftime('%Y-%m-%d')}")
+        
+        # Сообщаем о завершении (100%)
+        if progress_callback:
+            progress_callback(1.0)
+            
+        return df_combined
+    
+    # Если нет успешно обработанных файлов, но есть данные в памяти
+    if all_news_data:
         df = pd.DataFrame(all_news_data)
-        # Убедимся, что все ожидаемые колонки присутствуют
+        expected_columns = ["title", "text", "date", "url"]
         for col in expected_columns:
             if col not in df.columns:
-                df[col] = pd.NA 
-
-        if df.empty: # Если DataFrame создался, но оказался пустым (например, all_news_data содержал только пустые словари)
-            safe_print(f"DataFrame оказался пустым после инициализации из all_news_data для периода {start_date.strftime('%Y-%m-%d')} по {end_date.strftime('%Y-%m-%d')}")
-            # Пересоздаем с правильными колонками, если он стал пустым без них
-            if not all(c in df.columns for c in expected_columns):
-                 df = pd.DataFrame(columns=expected_columns)
-        else:
-            # Обработка дат и фильтрация только если DataFrame не пустой и содержит колонку 'date'
-            if 'date' in df.columns:
-                try:
-                    df['date'] = pd.to_datetime(df['date']).dt.tz_localize(None)
-                    df = df[(df['date'].dt.date >= start_date.date()) & (df['date'].dt.date <= end_date.date())]
-                except Exception as e_date_conv:
-                    safe_print(f"Ошибка при конвертации или фильтрации дат: {e_date_conv}. Столбец 'date':\n{df['date'] if 'date' in df.columns else 'отсутствует'}")
-            else:
-                safe_print("Колонка 'date' отсутствует в DataFrame перед фильтрацией.")
-
-            df = df.drop_duplicates(subset=['url'], keep='first').reset_index(drop=True)
-
-            if df.empty:
-                safe_print(f"После фильтрации не осталось новостей с Lenta.ru за период с {start_date.strftime('%Y-%m-%d')} по {end_date.strftime('%Y-%m-%d')}")
-                # Если df стал пустым, но колонки были - они сохранятся.
-                # Если их не было, нужно убедиться, что они есть
-                if not all(c in df.columns for c in expected_columns):
-                    df = pd.DataFrame(columns=expected_columns) # Гарантируем колонки, если df стал пустым и их не было
-            else:
-                os.makedirs("./data/raw", exist_ok=True)
-                output_filename = f"./data/raw/lenta-news_{start_date.strftime('%Y%m%d')}-{end_date.strftime('%Y%m%d')}.csv"
-                try:
-                    df.to_csv(output_filename, index=False, encoding='utf-8')
-                    safe_print(f"Собрано {len(df)} новостей с Lenta.ru за период с {start_date.strftime('%Y-%m-%d')} по {end_date.strftime('%Y-%m-%d')}")
-                    safe_print(f"Данные сохранены в {output_filename}")
-                except Exception as e:
-                    safe_print(f"Ошибка при сохранении файла {output_filename}: {e}")
-
-    # Финальная проверка и добавление недостающих колонок
-    if df is None:
-        df = pd.DataFrame(columns=expected_columns) # Если df каким-то чудом стал None
+                df[col] = pd.NA
+        
+        if 'date' in df.columns:
+            df['date'] = pd.to_datetime(df['date']).dt.tz_localize(None)
+        
+        safe_print(f"Всего собрано {len(df)} новостей за период с {start_date.strftime('%Y-%m-%d')} по {end_date.strftime('%Y-%m-%d')}")
+        
+        # Сообщаем о завершении (100%)
+        if progress_callback:
+            progress_callback(1.0)
+            
+        return df
     
-    current_cols = df.columns.tolist()
-    for col_final_check in expected_columns:
-        if col_final_check not in current_cols:
-            df[col_final_check] = pd.NA
-            safe_print(f"Финальная проверка: добавлена недостающая колонка '{col_final_check}'")
-
-    return df
+    # Если нет ни файлов, ни данных в памяти
+    safe_print(f"Не найдено новостей с Lenta.ru за период с {start_date.strftime('%Y-%m-%d')} по {end_date.strftime('%Y-%m-%d')}")
+    
+    # Сообщаем о завершении (100%), даже если новости не найдены
+    if progress_callback:
+        progress_callback(1.0)
+        
+    return pd.DataFrame(columns=["title", "text", "date", "url"])
 
 
 def get_full_news_content(url, headers):
