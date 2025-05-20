@@ -183,3 +183,4 @@ data/processed/*
 data/interim/*
 data/external/*
 dagster/dagster-pipeline/data/raw/lenta-news.csv
+/data
