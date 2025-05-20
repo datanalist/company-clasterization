@@ -5,10 +5,65 @@
 groups = ["default"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:bb847a91ad3b489da9bffd974c0d51375d9d8ef1c836b9297fd8465549be875f"
+content_hash = "sha256:106e39c16cc8e44cfc4ff857dabbbd50dabf32616e2acafd9e5229dfad18f021"
 
 [[metadata.targets]]
 requires_python = "==3.11.*"
+
+[[package]]
+name = "adlfs"
+version = "2024.12.0"
+requires_python = ">=3.9"
+summary = "Access Azure Datalake Gen1 with fsspec and dask"
+groups = ["default"]
+dependencies = [
+    "aiohttp>=3.7.0",
+    "azure-core<2.0.0,>=1.28.0",
+    "azure-datalake-store<0.1,>=0.0.53",
+    "azure-identity",
+    "azure-storage-blob>=12.17.0",
+    "fsspec>=2023.12.0",
+]
+files = [
+    {file = "adlfs-2024.12.0-py3-none-any.whl", hash = "sha256:00aab061ddec0413b2039487e656b62e01ece8ef1ca0493f76034a596cf069e3"},
+    {file = "adlfs-2024.12.0.tar.gz", hash = "sha256:04582bf7461a57365766d01a295a0a88b2b8c42c4fea06e2d673f62675cac5c6"},
+]
+
+[[package]]
+name = "aiobotocore"
+version = "2.22.0"
+requires_python = ">=3.8"
+summary = "Async client for aws services using botocore and aiohttp"
+groups = ["default"]
+dependencies = [
+    "aiohttp<4.0.0,>=3.9.2",
+    "aioitertools<1.0.0,>=0.5.1",
+    "botocore<1.37.4,>=1.37.2",
+    "jmespath<2.0.0,>=0.7.1",
+    "multidict<7.0.0,>=6.0.0",
+    "python-dateutil<3.0.0,>=2.1",
+    "wrapt<2.0.0,>=1.10.10",
+]
+files = [
+    {file = "aiobotocore-2.22.0-py3-none-any.whl", hash = "sha256:b4e6306f79df9d81daff1f9d63189a2dbee4b77ce3ab937304834e35eaaeeccf"},
+    {file = "aiobotocore-2.22.0.tar.gz", hash = "sha256:11091477266b75c2b5d28421c1f2bc9a87d175d0b8619cb830805e7a113a170b"},
+]
+
+[[package]]
+name = "aiobotocore"
+version = "2.22.0"
+extras = ["boto3"]
+requires_python = ">=3.8"
+summary = "Async client for aws services using botocore and aiohttp"
+groups = ["default"]
+dependencies = [
+    "aiobotocore==2.22.0",
+    "boto3<1.37.4,>=1.37.2",
+]
+files = [
+    {file = "aiobotocore-2.22.0-py3-none-any.whl", hash = "sha256:b4e6306f79df9d81daff1f9d63189a2dbee4b77ce3ab937304834e35eaaeeccf"},
+    {file = "aiobotocore-2.22.0.tar.gz", hash = "sha256:11091477266b75c2b5d28421c1f2bc9a87d175d0b8619cb830805e7a113a170b"},
+]
 
 [[package]]
 name = "aiohappyeyeballs"
@@ -58,6 +113,49 @@ files = [
 ]
 
 [[package]]
+name = "aiohttp-retry"
+version = "2.9.1"
+requires_python = ">=3.7"
+summary = "Simple retry client for aiohttp"
+groups = ["default"]
+dependencies = [
+    "aiohttp",
+]
+files = [
+    {file = "aiohttp_retry-2.9.1-py3-none-any.whl", hash = "sha256:66d2759d1921838256a05a3f80ad7e724936f083e35be5abb5e16eed6be6dc54"},
+    {file = "aiohttp_retry-2.9.1.tar.gz", hash = "sha256:8eb75e904ed4ee5c2ec242fefe85bf04240f685391c4879d8f541d6028ff01f1"},
+]
+
+[[package]]
+name = "aioitertools"
+version = "0.12.0"
+requires_python = ">=3.8"
+summary = "itertools and builtins for AsyncIO and mixed iterables"
+groups = ["default"]
+dependencies = [
+    "typing-extensions>=4.0; python_version < \"3.10\"",
+]
+files = [
+    {file = "aioitertools-0.12.0-py3-none-any.whl", hash = "sha256:fc1f5fac3d737354de8831cbba3eb04f79dd649d8f3afb4c5b114925e662a796"},
+    {file = "aioitertools-0.12.0.tar.gz", hash = "sha256:c2a9055b4fbb7705f561b9d86053e8af5d10cc845d22c32008c43490b2d8dd6b"},
+]
+
+[[package]]
+name = "aiooss2"
+version = "0.2.11"
+requires_python = ">=3.8"
+summary = "Async client for aliyun OSS(Object Storage Service) using oss2 and aiohttp/asyncio"
+groups = ["default"]
+dependencies = [
+    "aiohttp<4,>=3.9.1",
+    "oss2==2.18.4",
+]
+files = [
+    {file = "aiooss2-0.2.11-py3-none-any.whl", hash = "sha256:d24a00f38ef819cb4de89a2a22875ed15286982c80488d81ce113bbb12956ba0"},
+    {file = "aiooss2-0.2.11.tar.gz", hash = "sha256:6409e0f7ab66bed364a1c9639b657437175534de160f330d0103a445a2e89a59"},
+]
+
+[[package]]
 name = "aiosignal"
 version = "1.3.2"
 requires_python = ">=3.9"
@@ -88,6 +186,33 @@ files = [
 ]
 
 [[package]]
+name = "aliyun-python-sdk-core"
+version = "2.16.0"
+requires_python = ">=3.7"
+summary = "The core module of Aliyun Python SDK."
+groups = ["default"]
+dependencies = [
+    "cryptography>=3.0.0",
+    "jmespath<1.0.0,>=0.9.3",
+]
+files = [
+    {file = "aliyun-python-sdk-core-2.16.0.tar.gz", hash = "sha256:651caad597eb39d4fad6cf85133dffe92837d53bdf62db9d8f37dab6508bb8f9"},
+]
+
+[[package]]
+name = "aliyun-python-sdk-kms"
+version = "2.16.5"
+summary = "The kms module of Aliyun Python sdk."
+groups = ["default"]
+dependencies = [
+    "aliyun-python-sdk-core>=2.11.5",
+]
+files = [
+    {file = "aliyun-python-sdk-kms-2.16.5.tar.gz", hash = "sha256:f328a8a19d83ecbb965ffce0ec1e9930755216d104638cd95ecd362753b813b3"},
+    {file = "aliyun_python_sdk_kms-2.16.5-py2.py3-none-any.whl", hash = "sha256:24b6cdc4fd161d2942619479c8d050c63ea9cd22b044fe33b60bbb60153786f0"},
+]
+
+[[package]]
 name = "altair"
 version = "5.5.0"
 requires_python = ">=3.9"
@@ -106,6 +231,20 @@ files = [
 ]
 
 [[package]]
+name = "amqp"
+version = "5.3.1"
+requires_python = ">=3.6"
+summary = "Low-level AMQP client for Python (fork of amqplib)."
+groups = ["default"]
+dependencies = [
+    "vine<6.0.0,>=5.0.0",
+]
+files = [
+    {file = "amqp-5.3.1-py3-none-any.whl", hash = "sha256:43b3319e1b4e7d1251833a93d672b4af1e40f3d632d479b98661a95f117880a2"},
+    {file = "amqp-5.3.1.tar.gz", hash = "sha256:cddc00c725449522023bad949f70fff7b48f0b1ade74d170a6f10ab044739432"},
+]
+
+[[package]]
 name = "annotated-types"
 version = "0.7.0"
 requires_python = ">=3.8"
@@ -121,15 +260,14 @@ files = [
 
 [[package]]
 name = "antlr4-python3-runtime"
-version = "4.13.2"
-summary = "ANTLR 4.13.2 runtime for Python 3"
+version = "4.9.3"
+summary = "ANTLR 4.9.3 runtime for Python 3.7"
 groups = ["default"]
 dependencies = [
     "typing; python_version < \"3.5\"",
 ]
 files = [
-    {file = "antlr4_python3_runtime-4.13.2-py3-none-any.whl", hash = "sha256:fe3835eb8d33daece0e799090eda89719dbccee7aa39ef94eed3818cafa5a7e8"},
-    {file = "antlr4_python3_runtime-4.13.2.tar.gz", hash = "sha256:909b647e1d2fc2b70180ac586df3933e38919c85f98ccc656a96cd3f25ef3916"},
+    {file = "antlr4-python3-runtime-4.9.3.tar.gz", hash = "sha256:f224469b4168294902bb1efa80a8bf7855f24c99aef99cbefc1bcd3cce77881b"},
 ]
 
 [[package]]
@@ -150,6 +288,16 @@ files = [
 ]
 
 [[package]]
+name = "appdirs"
+version = "1.4.4"
+summary = "A small Python module for determining appropriate platform-specific dirs, e.g. a \"user data dir\"."
+groups = ["default"]
+files = [
+    {file = "appdirs-1.4.4-py2.py3-none-any.whl", hash = "sha256:a841dacd6b99318a741b166adb07e19ee71a274450e68237b4650ca1055ab128"},
+    {file = "appdirs-1.4.4.tar.gz", hash = "sha256:7d5d0167b2b1ba821647616af46a749d1c653740dd0d2415100fe26e27afdf41"},
+]
+
+[[package]]
 name = "appnope"
 version = "0.1.4"
 requires_python = ">=3.6"
@@ -159,6 +307,17 @@ marker = "platform_system == \"Darwin\""
 files = [
     {file = "appnope-0.1.4-py2.py3-none-any.whl", hash = "sha256:502575ee11cd7a28c0205f379b525beefebab9d161b7c964670864014ed7213c"},
     {file = "appnope-0.1.4.tar.gz", hash = "sha256:1de3860566df9caf38f01f86f65e0e13e379af54f9e4bee1e66b48f2efffd1ee"},
+]
+
+[[package]]
+name = "argcomplete"
+version = "3.6.2"
+requires_python = ">=3.8"
+summary = "Bash tab completion for argparse"
+groups = ["default"]
+files = [
+    {file = "argcomplete-3.6.2-py3-none-any.whl", hash = "sha256:65b3133a29ad53fb42c48cf5114752c7ab66c1c38544fdf6460f450c09b42591"},
+    {file = "argcomplete-3.6.2.tar.gz", hash = "sha256:d0519b1bc867f5f4f4713c41ad0aba73a4a5f007449716b16f385f2166dc6adf"},
 ]
 
 [[package]]
@@ -173,6 +332,48 @@ files = [
 ]
 
 [[package]]
+name = "asyncssh"
+version = "2.21.0"
+requires_python = ">=3.6"
+summary = "AsyncSSH: Asynchronous SSHv2 client and server library"
+groups = ["default"]
+dependencies = [
+    "cryptography>=39.0",
+    "typing-extensions>=4.0.0",
+]
+files = [
+    {file = "asyncssh-2.21.0-py3-none-any.whl", hash = "sha256:cf7f3dfa52b2cb4ad31f0d77ff0d0a8fdd850203da84a0e72e62c36fdd4daf4b"},
+    {file = "asyncssh-2.21.0.tar.gz", hash = "sha256:450fe13bb8d86a8f4e7d7b5fafce7791181ca3e7c92e15bbc45dfb25866e48b3"},
+]
+
+[[package]]
+name = "asyncssh"
+version = "2.21.0"
+extras = ["bcrypt"]
+requires_python = ">=3.6"
+summary = "AsyncSSH: Asynchronous SSHv2 client and server library"
+groups = ["default"]
+dependencies = [
+    "asyncssh==2.21.0",
+    "bcrypt>=3.1.3",
+]
+files = [
+    {file = "asyncssh-2.21.0-py3-none-any.whl", hash = "sha256:cf7f3dfa52b2cb4ad31f0d77ff0d0a8fdd850203da84a0e72e62c36fdd4daf4b"},
+    {file = "asyncssh-2.21.0.tar.gz", hash = "sha256:450fe13bb8d86a8f4e7d7b5fafce7791181ca3e7c92e15bbc45dfb25866e48b3"},
+]
+
+[[package]]
+name = "atpublic"
+version = "6.0.1"
+requires_python = ">=3.9"
+summary = "Keep all y'all's __all__'s in sync"
+groups = ["default"]
+files = [
+    {file = "atpublic-6.0.1-py3-none-any.whl", hash = "sha256:f9a23902faf5ca1fdc6436b3712d79452f71abc61a810d22be1f31b40a8004c5"},
+    {file = "atpublic-6.0.1.tar.gz", hash = "sha256:718932844f5bdfdf5d80ad4c64e13964f22274b4f8937d54a8d3811d6bc5dc05"},
+]
+
+[[package]]
 name = "attrs"
 version = "25.3.0"
 requires_python = ">=3.8"
@@ -181,6 +382,75 @@ groups = ["default"]
 files = [
     {file = "attrs-25.3.0-py3-none-any.whl", hash = "sha256:427318ce031701fea540783410126f03899a97ffc6f61596ad581ac2e40e3bc3"},
     {file = "attrs-25.3.0.tar.gz", hash = "sha256:75d7cefc7fb576747b2c81b4442d4d4a1ce0900973527c011d1030fd3bf4af1b"},
+]
+
+[[package]]
+name = "azure-core"
+version = "1.34.0"
+requires_python = ">=3.9"
+summary = "Microsoft Azure Core Library for Python"
+groups = ["default"]
+dependencies = [
+    "requests>=2.21.0",
+    "six>=1.11.0",
+    "typing-extensions>=4.6.0",
+]
+files = [
+    {file = "azure_core-1.34.0-py3-none-any.whl", hash = "sha256:0615d3b756beccdb6624d1c0ae97284f38b78fb59a2a9839bf927c66fbbdddd6"},
+    {file = "azure_core-1.34.0.tar.gz", hash = "sha256:bdb544989f246a0ad1c85d72eeb45f2f835afdcbc5b45e43f0dbde7461c81ece"},
+]
+
+[[package]]
+name = "azure-datalake-store"
+version = "0.0.53"
+summary = "Azure Data Lake Store Filesystem Client Library for Python"
+groups = ["default"]
+dependencies = [
+    "azure-nspkg; python_version < \"3.0\"",
+    "cffi",
+    "futures; python_version <= \"2.7\"",
+    "msal<2,>=1.16.0",
+    "pathlib2; python_version < \"3.4\"",
+    "requests>=2.20.0",
+]
+files = [
+    {file = "azure-datalake-store-0.0.53.tar.gz", hash = "sha256:05b6de62ee3f2a0a6e6941e6933b792b800c3e7f6ffce2fc324bc19875757393"},
+    {file = "azure_datalake_store-0.0.53-py2.py3-none-any.whl", hash = "sha256:a30c902a6e360aa47d7f69f086b426729784e71c536f330b691647a51dc42b2b"},
+]
+
+[[package]]
+name = "azure-identity"
+version = "1.23.0"
+requires_python = ">=3.9"
+summary = "Microsoft Azure Identity Library for Python"
+groups = ["default"]
+dependencies = [
+    "azure-core>=1.31.0",
+    "cryptography>=2.5",
+    "msal-extensions>=1.2.0",
+    "msal>=1.30.0",
+    "typing-extensions>=4.0.0",
+]
+files = [
+    {file = "azure_identity-1.23.0-py3-none-any.whl", hash = "sha256:dbbeb64b8e5eaa81c44c565f264b519ff2de7ff0e02271c49f3cb492762a50b0"},
+    {file = "azure_identity-1.23.0.tar.gz", hash = "sha256:d9cdcad39adb49d4bb2953a217f62aec1f65bbb3c63c9076da2be2a47e53dde4"},
+]
+
+[[package]]
+name = "azure-storage-blob"
+version = "12.25.1"
+requires_python = ">=3.8"
+summary = "Microsoft Azure Blob Storage Client Library for Python"
+groups = ["default"]
+dependencies = [
+    "azure-core>=1.30.0",
+    "cryptography>=2.1.4",
+    "isodate>=0.6.1",
+    "typing-extensions>=4.6.0",
+]
+files = [
+    {file = "azure_storage_blob-12.25.1-py3-none-any.whl", hash = "sha256:1f337aab12e918ec3f1b638baada97550673911c4ceed892acc8e4e891b74167"},
+    {file = "azure_storage_blob-12.25.1.tar.gz", hash = "sha256:4f294ddc9bc47909ac66b8934bd26b50d2000278b10ad82cc109764fdc6e0e3b"},
 ]
 
 [[package]]
@@ -254,6 +524,17 @@ files = [
 ]
 
 [[package]]
+name = "billiard"
+version = "4.2.1"
+requires_python = ">=3.7"
+summary = "Python multiprocessing fork with improvements and bugfixes"
+groups = ["default"]
+files = [
+    {file = "billiard-4.2.1-py3-none-any.whl", hash = "sha256:40b59a4ac8806ba2c2369ea98d876bc6108b051c227baffd928c644d15d8f3cb"},
+    {file = "billiard-4.2.1.tar.gz", hash = "sha256:12b641b0c539073fc8d3f5b8b7be998956665c4233c7c1fcd66a7e677c4fb36f"},
+]
+
+[[package]]
 name = "blinker"
 version = "1.9.0"
 requires_python = ">=3.9"
@@ -262,6 +543,39 @@ groups = ["default"]
 files = [
     {file = "blinker-1.9.0-py3-none-any.whl", hash = "sha256:ba0efaa9080b619ff2f3459d1d500c57bddea4a6b424b60a91141db6fd2f08bc"},
     {file = "blinker-1.9.0.tar.gz", hash = "sha256:b4ce2265a7abece45e7cc896e98dbebe6cead56bcf805a3d23136d145f5445bf"},
+]
+
+[[package]]
+name = "boto3"
+version = "1.37.3"
+requires_python = ">=3.8"
+summary = "The AWS SDK for Python"
+groups = ["default"]
+dependencies = [
+    "botocore<1.38.0,>=1.37.3",
+    "jmespath<2.0.0,>=0.7.1",
+    "s3transfer<0.12.0,>=0.11.0",
+]
+files = [
+    {file = "boto3-1.37.3-py3-none-any.whl", hash = "sha256:2063b40af99fd02f6228ff52397b552ff3353831edaf8d25cc04801827ab9794"},
+    {file = "boto3-1.37.3.tar.gz", hash = "sha256:21f3ce0ef111297e63a6eb998a25197b8c10982970c320d4c6e8db08be2157be"},
+]
+
+[[package]]
+name = "botocore"
+version = "1.37.3"
+requires_python = ">=3.8"
+summary = "Low-level, data-driven core of boto 3."
+groups = ["default"]
+dependencies = [
+    "jmespath<2.0.0,>=0.7.1",
+    "python-dateutil<3.0.0,>=2.1",
+    "urllib3!=2.2.0,<3,>=1.25.4; python_version >= \"3.10\"",
+    "urllib3<1.27,>=1.25.4; python_version < \"3.10\"",
+]
+files = [
+    {file = "botocore-1.37.3-py3-none-any.whl", hash = "sha256:d01bd3bf4c80e61fa88d636ad9f5c9f60a551d71549b481386c6b4efe0bb2b2e"},
+    {file = "botocore-1.37.3.tar.gz", hash = "sha256:fe8403eb55a88faf9b0f9da6615e5bee7be056d75e17af66c3c8f0a3b0648da4"},
 ]
 
 [[package]]
@@ -286,6 +600,28 @@ groups = ["default"]
 files = [
     {file = "cachetools-5.5.2-py3-none-any.whl", hash = "sha256:d26a22bcc62eb95c3beabd9f1ee5e820d3d2704fe2967cbe350e20c8ffcd3f0a"},
     {file = "cachetools-5.5.2.tar.gz", hash = "sha256:1a661caa9175d26759571b2e19580f9d6393969e5dfca11fdb1f947a23e640d4"},
+]
+
+[[package]]
+name = "celery"
+version = "5.5.2"
+requires_python = ">=3.8"
+summary = "Distributed Task Queue."
+groups = ["default"]
+dependencies = [
+    "backports-zoneinfo[tzdata]>=0.2.1; python_version < \"3.9\"",
+    "billiard<5.0,>=4.2.1",
+    "click-didyoumean>=0.3.0",
+    "click-plugins>=1.1.1",
+    "click-repl>=0.2.0",
+    "click<9.0,>=8.1.2",
+    "kombu<5.6,>=5.5.2",
+    "python-dateutil>=2.8.2",
+    "vine<6.0,>=5.1.0",
+]
+files = [
+    {file = "celery-5.5.2-py3-none-any.whl", hash = "sha256:54425a067afdc88b57cd8d94ed4af2ffaf13ab8c7680041ac2c4ac44357bdf4c"},
+    {file = "celery-5.5.2.tar.gz", hash = "sha256:4d6930f354f9d29295425d7a37261245c74a32807c45d764bedc286afd0e724e"},
 ]
 
 [[package]]
@@ -380,16 +716,59 @@ files = [
 
 [[package]]
 name = "click"
-version = "8.2.0"
-requires_python = ">=3.10"
+version = "8.1.8"
+requires_python = ">=3.7"
 summary = "Composable command line interface toolkit"
 groups = ["default"]
 dependencies = [
     "colorama; platform_system == \"Windows\"",
+    "importlib-metadata; python_version < \"3.8\"",
 ]
 files = [
-    {file = "click-8.2.0-py3-none-any.whl", hash = "sha256:6b303f0b2aa85f1cb4e5303078fadcbcd4e476f114fab9b5007005711839325c"},
-    {file = "click-8.2.0.tar.gz", hash = "sha256:f5452aeddd9988eefa20f90f05ab66f17fce1ee2a36907fd30b05bbb5953814d"},
+    {file = "click-8.1.8-py3-none-any.whl", hash = "sha256:63c132bbbed01578a06712a2d1f497bb62d9c1c0d329b7903a866228027263b2"},
+    {file = "click-8.1.8.tar.gz", hash = "sha256:ed53c9d8990d83c2a27deae68e4ee337473f6330c040a31d4225c9574d16096a"},
+]
+
+[[package]]
+name = "click-didyoumean"
+version = "0.3.1"
+requires_python = ">=3.6.2"
+summary = "Enables git-like *did-you-mean* feature in click"
+groups = ["default"]
+dependencies = [
+    "click>=7",
+]
+files = [
+    {file = "click_didyoumean-0.3.1-py3-none-any.whl", hash = "sha256:5c4bb6007cfea5f2fd6583a2fb6701a22a41eb98957e63d0fac41c10e7c3117c"},
+    {file = "click_didyoumean-0.3.1.tar.gz", hash = "sha256:4f82fdff0dbe64ef8ab2279bd6aa3f6a99c3b28c05aa09cbfc07c9d7fbb5a463"},
+]
+
+[[package]]
+name = "click-plugins"
+version = "1.1.1"
+summary = "An extension module for click to enable registering CLI commands via setuptools entry-points."
+groups = ["default"]
+dependencies = [
+    "click>=4.0",
+]
+files = [
+    {file = "click-plugins-1.1.1.tar.gz", hash = "sha256:46ab999744a9d831159c3411bb0c79346d94a444df9a3a3742e9ed63645f264b"},
+    {file = "click_plugins-1.1.1-py2.py3-none-any.whl", hash = "sha256:5d262006d3222f5057fd81e1623d4443e41dcda5dc815c06b442aa3c02889fc8"},
+]
+
+[[package]]
+name = "click-repl"
+version = "0.3.0"
+requires_python = ">=3.6"
+summary = "REPL plugin for Click"
+groups = ["default"]
+dependencies = [
+    "click>=7.0",
+    "prompt-toolkit>=3.0.36",
+]
+files = [
+    {file = "click-repl-0.3.0.tar.gz", hash = "sha256:17849c23dba3d667247dc4defe1757fff98694e90fe37474f3feebb69ced26a9"},
+    {file = "click_repl-0.3.0-py3-none-any.whl", hash = "sha256:fb7e06deb8da8de86180a33a9da97ac316751c094c6899382da7feeeeb51b812"},
 ]
 
 [[package]]
@@ -398,7 +777,6 @@ version = "0.4.6"
 requires_python = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,!=3.6.*,>=2.7"
 summary = "Cross-platform colored terminal text."
 groups = ["default"]
-marker = "platform_system == \"Windows\" or sys_platform == \"win32\""
 files = [
     {file = "colorama-0.4.6-py2.py3-none-any.whl", hash = "sha256:4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6"},
     {file = "colorama-0.4.6.tar.gz", hash = "sha256:08695f5cb7ed6e0531a20572697297273c47b8cae5a63ffc6d6ed5c201be6e44"},
@@ -433,6 +811,17 @@ files = [
 ]
 
 [[package]]
+name = "configobj"
+version = "5.0.9"
+requires_python = ">=3.7"
+summary = "Config file reading, writing and validation."
+groups = ["default"]
+files = [
+    {file = "configobj-5.0.9-py2.py3-none-any.whl", hash = "sha256:1ba10c5b6ee16229c79a05047aeda2b55eb4e80d7c7d8ecf17ec1ca600c79882"},
+    {file = "configobj-5.0.9.tar.gz", hash = "sha256:03c881bbf23aa07bccf1b837005975993c4ab4427ba57f959afdd9d1a2386848"},
+]
+
+[[package]]
 name = "contourpy"
 version = "1.3.2"
 requires_python = ">=3.10"
@@ -456,6 +845,46 @@ files = [
     {file = "contourpy-1.3.2-pp311-pypy311_pp73-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:49b65a95d642d4efa8f64ba12558fcb83407e58a2dfba9d796d77b63ccfcaff5"},
     {file = "contourpy-1.3.2-pp311-pypy311_pp73-win_amd64.whl", hash = "sha256:8c5acb8dddb0752bf252e01a3035b21443158910ac16a3b0d20e7fed7d534ce5"},
     {file = "contourpy-1.3.2.tar.gz", hash = "sha256:b6945942715a034c671b7fc54f9588126b0b8bf23db2696e3ca8328f3ff0ab54"},
+]
+
+[[package]]
+name = "crcmod"
+version = "1.7"
+summary = "CRC Generator"
+groups = ["default"]
+files = [
+    {file = "crcmod-1.7.tar.gz", hash = "sha256:dc7051a0db5f2bd48665a990d3ec1cc305a466a77358ca4492826f41f283601e"},
+]
+
+[[package]]
+name = "cryptography"
+version = "43.0.3"
+requires_python = ">=3.7"
+summary = "cryptography is a package which provides cryptographic recipes and primitives to Python developers."
+groups = ["default"]
+dependencies = [
+    "cffi>=1.12; platform_python_implementation != \"PyPy\"",
+]
+files = [
+    {file = "cryptography-43.0.3-cp37-abi3-macosx_10_9_universal2.whl", hash = "sha256:bf7a1932ac4176486eab36a19ed4c0492da5d97123f1406cf15e41b05e787d2e"},
+    {file = "cryptography-43.0.3-cp37-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:63efa177ff54aec6e1c0aefaa1a241232dcd37413835a9b674b6e3f0ae2bfd3e"},
+    {file = "cryptography-43.0.3-cp37-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:7e1ce50266f4f70bf41a2c6dc4358afadae90e2a1e5342d3c08883df1675374f"},
+    {file = "cryptography-43.0.3-cp37-abi3-manylinux_2_28_aarch64.whl", hash = "sha256:443c4a81bb10daed9a8f334365fe52542771f25aedaf889fd323a853ce7377d6"},
+    {file = "cryptography-43.0.3-cp37-abi3-manylinux_2_28_x86_64.whl", hash = "sha256:74f57f24754fe349223792466a709f8e0c093205ff0dca557af51072ff47ab18"},
+    {file = "cryptography-43.0.3-cp37-abi3-musllinux_1_2_aarch64.whl", hash = "sha256:9762ea51a8fc2a88b70cf2995e5675b38d93bf36bd67d91721c309df184f49bd"},
+    {file = "cryptography-43.0.3-cp37-abi3-musllinux_1_2_x86_64.whl", hash = "sha256:81ef806b1fef6b06dcebad789f988d3b37ccaee225695cf3e07648eee0fc6b73"},
+    {file = "cryptography-43.0.3-cp37-abi3-win32.whl", hash = "sha256:cbeb489927bd7af4aa98d4b261af9a5bc025bd87f0e3547e11584be9e9427be2"},
+    {file = "cryptography-43.0.3-cp37-abi3-win_amd64.whl", hash = "sha256:f46304d6f0c6ab8e52770addfa2fc41e6629495548862279641972b6215451cd"},
+    {file = "cryptography-43.0.3-cp39-abi3-macosx_10_9_universal2.whl", hash = "sha256:8ac43ae87929a5982f5948ceda07001ee5e83227fd69cf55b109144938d96984"},
+    {file = "cryptography-43.0.3-cp39-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:846da004a5804145a5f441b8530b4bf35afbf7da70f82409f151695b127213d5"},
+    {file = "cryptography-43.0.3-cp39-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:0f996e7268af62598f2fc1204afa98a3b5712313a55c4c9d434aef49cadc91d4"},
+    {file = "cryptography-43.0.3-cp39-abi3-manylinux_2_28_aarch64.whl", hash = "sha256:f7b178f11ed3664fd0e995a47ed2b5ff0a12d893e41dd0494f406d1cf555cab7"},
+    {file = "cryptography-43.0.3-cp39-abi3-manylinux_2_28_x86_64.whl", hash = "sha256:c2e6fc39c4ab499049df3bdf567f768a723a5e8464816e8f009f121a5a9f4405"},
+    {file = "cryptography-43.0.3-cp39-abi3-musllinux_1_2_aarch64.whl", hash = "sha256:e1be4655c7ef6e1bbe6b5d0403526601323420bcf414598955968c9ef3eb7d16"},
+    {file = "cryptography-43.0.3-cp39-abi3-musllinux_1_2_x86_64.whl", hash = "sha256:df6b6c6d742395dd77a23ea3728ab62f98379eff8fb61be2744d4679ab678f73"},
+    {file = "cryptography-43.0.3-cp39-abi3-win32.whl", hash = "sha256:d56e96520b1020449bbace2b78b603442e7e378a9b3bd68de65c782db1507995"},
+    {file = "cryptography-43.0.3-cp39-abi3-win_amd64.whl", hash = "sha256:0c580952eef9bf68c4747774cde7ec1d85a6e61de97281f2dba83c7d2c806362"},
+    {file = "cryptography-43.0.3.tar.gz", hash = "sha256:315b9001266a492a6ff443b61238f956b214dbec9910a081ba5b6646a055a805"},
 ]
 
 [[package]]
@@ -647,6 +1076,27 @@ files = [
 ]
 
 [[package]]
+name = "dictdiffer"
+version = "0.9.0"
+summary = "Dictdiffer is a library that helps you to diff and patch dictionaries."
+groups = ["default"]
+files = [
+    {file = "dictdiffer-0.9.0-py2.py3-none-any.whl", hash = "sha256:442bfc693cfcadaf46674575d2eba1c53b42f5e404218ca2c2ff549f2df56595"},
+    {file = "dictdiffer-0.9.0.tar.gz", hash = "sha256:17bacf5fbfe613ccf1b6d512bd766e6b21fb798822a133aa86098b8ac9997578"},
+]
+
+[[package]]
+name = "diskcache"
+version = "5.6.3"
+requires_python = ">=3"
+summary = "Disk Cache -- Disk and file backed persistent cache."
+groups = ["default"]
+files = [
+    {file = "diskcache-5.6.3-py3-none-any.whl", hash = "sha256:5e31b2d5fbad117cc363ebaf6b689474db18a1f6438bc82358b024abd4c2ca19"},
+    {file = "diskcache-5.6.3.tar.gz", hash = "sha256:2c3a3fa2743d8535d832ec61c2054a1641f41775aa7c556758a109941e33e4fc"},
+]
+
+[[package]]
 name = "distlib"
 version = "0.3.9"
 summary = "Distribution utilities"
@@ -654,6 +1104,17 @@ groups = ["default"]
 files = [
     {file = "distlib-0.3.9-py2.py3-none-any.whl", hash = "sha256:47f8c22fd27c27e25a65601af709b38e4f0a45ea4fc2e710f65755fa8caaaf87"},
     {file = "distlib-0.3.9.tar.gz", hash = "sha256:a60f20dea646b8a33f3e7772f74dc0b2d0772d2837ee1342a00645c81edf9403"},
+]
+
+[[package]]
+name = "distro"
+version = "1.9.0"
+requires_python = ">=3.6"
+summary = "Distro - an OS platform information API"
+groups = ["default"]
+files = [
+    {file = "distro-1.9.0-py3-none-any.whl", hash = "sha256:7bffd925d65168f85027d8da9af6bddab658135b840670a223589bc0c8ef02b2"},
+    {file = "distro-1.9.0.tar.gz", hash = "sha256:2fa77c6fd8940f116ee1d6b94a2f90b13b5ea8d019b98bc8bafdcabcdd9bdbed"},
 ]
 
 [[package]]
@@ -665,6 +1126,17 @@ groups = ["default"]
 files = [
     {file = "docstring_parser-0.16-py3-none-any.whl", hash = "sha256:bf0a1387354d3691d102edef7ec124f219ef639982d096e26e3b60aeffa90637"},
     {file = "docstring_parser-0.16.tar.gz", hash = "sha256:538beabd0af1e2db0146b6bd3caa526c35a34d61af9fd2887f3a8a27a739aa6e"},
+]
+
+[[package]]
+name = "dpath"
+version = "2.2.0"
+requires_python = ">=3.7"
+summary = "Filesystem-like pathing and searching for dictionaries"
+groups = ["default"]
+files = [
+    {file = "dpath-2.2.0-py3-none-any.whl", hash = "sha256:b330a375ded0a0d2ed404440f6c6a715deae5313af40bbb01c8a41d891900576"},
+    {file = "dpath-2.2.0.tar.gz", hash = "sha256:34f7e630dc55ea3f219e555726f5da4b4b25f2200319c8e6902c394258dd6a3e"},
 ]
 
 [[package]]
@@ -686,6 +1158,363 @@ files = [
 ]
 
 [[package]]
+name = "dulwich"
+version = "0.22.8"
+requires_python = ">=3.9"
+summary = "Python Git Library"
+groups = ["default"]
+dependencies = [
+    "urllib3>=1.25",
+]
+files = [
+    {file = "dulwich-0.22.8-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:0852edc51cff4f4f62976bdaa1d82f6ef248356c681c764c0feb699bc17d5782"},
+    {file = "dulwich-0.22.8-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:826aae8b64ac1a12321d6b272fc13934d8f62804fda2bc6ae46f93f4380798eb"},
+    {file = "dulwich-0.22.8-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:f7ae726f923057d36cdbb9f4fb7da0d0903751435934648b13f1b851f0e38ea1"},
+    {file = "dulwich-0.22.8-cp311-cp311-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:6987d753227f55cf75ba29a8dab69d1d83308ce483d7a8c6d223086f7a42e125"},
+    {file = "dulwich-0.22.8-cp311-cp311-win32.whl", hash = "sha256:7757b4a2aad64c6f1920082fc1fccf4da25c3923a0ae7b242c08d06861dae6e1"},
+    {file = "dulwich-0.22.8-cp311-cp311-win_amd64.whl", hash = "sha256:12b243b7e912011c7225dc67480c313ac8d2990744789b876016fb593f6f3e19"},
+    {file = "dulwich-0.22.8-pp311-pypy311_pp73-macosx_10_15_x86_64.whl", hash = "sha256:f8aa3de93201f9e3e40198725389aa9554a4ee3318a865f96a8e9bc9080f0b25"},
+    {file = "dulwich-0.22.8-pp311-pypy311_pp73-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:1e8da9dd8135884975f5be0563ede02179240250e11f11942801ae31ac293f37"},
+    {file = "dulwich-0.22.8-pp311-pypy311_pp73-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:4fc5ce2435fb3abdf76f1acabe48f2e4b3f7428232cadaef9daaf50ea7fa30ee"},
+    {file = "dulwich-0.22.8-pp311-pypy311_pp73-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:982b21cc3100d959232cadb3da0a478bd549814dd937104ea50f43694ec27153"},
+    {file = "dulwich-0.22.8-pp311-pypy311_pp73-win_amd64.whl", hash = "sha256:6bde2b13a05cc0ec2ecd4597a99896663544c40af1466121f4d046119b874ce3"},
+    {file = "dulwich-0.22.8-py3-none-any.whl", hash = "sha256:ffc7a02e62b72884de58baaa3b898b7f6427893e79b1289ffa075092efe59181"},
+    {file = "dulwich-0.22.8.tar.gz", hash = "sha256:701547310415de300269331abe29cb5717aa1ea377af826bf513d0adfb1c209b"},
+]
+
+[[package]]
+name = "dvc"
+version = "3.59.2"
+requires_python = ">=3.9"
+summary = "Git for data scientists - manage your code and data together"
+groups = ["default"]
+dependencies = [
+    "attrs>=22.2.0",
+    "celery",
+    "colorama>=0.3.9",
+    "configobj>=5.0.9",
+    "distro>=1.3",
+    "dpath<3,>=2.1.0",
+    "dulwich",
+    "dvc-data<3.17,>=3.16.2",
+    "dvc-http>=2.29.0",
+    "dvc-objects",
+    "dvc-render<2,>=1.0.1",
+    "dvc-studio-client<1,>=0.21",
+    "dvc-task<1,>=0.3.0",
+    "flatten-dict<1,>=0.4.1",
+    "flufl-lock<9,>=8.1.0",
+    "fsspec>=2024.2.0",
+    "funcy>=1.14",
+    "grandalf<1,>=0.7",
+    "gto<2,>=1.6.0",
+    "hydra-core>=1.1",
+    "iterative-telemetry>=0.0.7",
+    "kombu",
+    "networkx>=2.5",
+    "omegaconf",
+    "packaging>=19",
+    "pathspec>=0.10.3",
+    "platformdirs<5,>=3.1.1",
+    "psutil>=5.8",
+    "pydot>=1.2.4",
+    "pygtrie>=2.3.2",
+    "pyparsing>=2.4.7",
+    "requests>=2.22",
+    "rich>=12",
+    "ruamel-yaml>=0.17.11",
+    "scmrepo<4,>=3.3.8",
+    "shortuuid>=0.5",
+    "shtab<2,>=1.3.4",
+    "tabulate>=0.8.7",
+    "tomlkit>=0.11.1",
+    "tqdm<5,>=4.63.1",
+    "voluptuous>=0.11.7",
+    "zc-lockfile>=1.2.1",
+]
+files = [
+    {file = "dvc-3.59.2-py3-none-any.whl", hash = "sha256:1fe6ea628e6565b131b6c2911934b220f91dca1d7c60d2b19428c893d0573999"},
+    {file = "dvc-3.59.2.tar.gz", hash = "sha256:3eecc058b5d43e4e3ff7dfa72970a5c7d26e7b19f48395946ab314ce479bc1ce"},
+]
+
+[[package]]
+name = "dvc-azure"
+version = "3.1.0"
+requires_python = ">=3.9"
+summary = "azure plugin for dvc"
+groups = ["default"]
+dependencies = [
+    "adlfs>=2023.12.0",
+    "azure-identity>=1.4.0",
+    "dvc",
+    "knack",
+]
+files = [
+    {file = "dvc-azure-3.1.0.tar.gz", hash = "sha256:52cbc70d5414b50219b3db0a16f68ad25daba76e3f220aebe4e49b3c6498ae20"},
+    {file = "dvc_azure-3.1.0-py3-none-any.whl", hash = "sha256:07295bedc5c596c38b7cc1a4353307cd045a322fef59eae3e64e95b143d495f2"},
+]
+
+[[package]]
+name = "dvc-data"
+version = "3.16.10"
+requires_python = ">=3.9"
+summary = "DVC's data management subsystem"
+groups = ["default"]
+dependencies = [
+    "attrs>=21.3.0",
+    "dictdiffer>=0.8.1",
+    "diskcache>=5.2.1",
+    "dvc-objects<6,>=4.0.1",
+    "fsspec>=2024.2.0",
+    "funcy>=1.14; python_version < \"3.12\"",
+    "orjson<4,>=3; implementation_name == \"cpython\"",
+    "pygtrie>=2.3.2",
+    "sqltrie<1,>=0.11.0",
+    "tqdm<5,>=4.63.1",
+]
+files = [
+    {file = "dvc_data-3.16.10-py3-none-any.whl", hash = "sha256:3e036d286d11a9fb542ab3aa732ffe384e4ebd16836a2022ab0915970ac7f116"},
+    {file = "dvc_data-3.16.10.tar.gz", hash = "sha256:abca33f2169eabc70d1966e2ef3cd290127ebdf141fb0e84db3d37fef49205c6"},
+]
+
+[[package]]
+name = "dvc-gdrive"
+version = "3.0.1"
+requires_python = ">=3.8"
+summary = "gdrive plugin for dvc"
+groups = ["default"]
+dependencies = [
+    "dvc",
+    "pydrive2[fsspec]>=1.19.0",
+]
+files = [
+    {file = "dvc-gdrive-3.0.1.tar.gz", hash = "sha256:ad7c9cd044083745150a57649eb4ef9240348f054bed5a8f8aa5f1820c6384ec"},
+    {file = "dvc_gdrive-3.0.1-py3-none-any.whl", hash = "sha256:9ee784501aa5229d4c02f195e783836d0d466c7218cf57bddcfa0f827ba5766c"},
+]
+
+[[package]]
+name = "dvc-gs"
+version = "3.0.1"
+requires_python = ">=3.8"
+summary = "gs plugin for dvc"
+groups = ["default"]
+dependencies = [
+    "dvc",
+    "gcsfs>=2022.11.0",
+]
+files = [
+    {file = "dvc-gs-3.0.1.tar.gz", hash = "sha256:e5430a297fb8182366f7c4bc910b1ab104d8e5cc22f611a19bce05165dffecd4"},
+    {file = "dvc_gs-3.0.1-py3-none-any.whl", hash = "sha256:e5d834760f6ac384bbc557c65ba027be298df7af4796eaf84b66b2df3bc64233"},
+]
+
+[[package]]
+name = "dvc-hdfs"
+version = "3.0.0"
+requires_python = ">=3.8"
+summary = "hdfs plugin for dvc"
+groups = ["default"]
+dependencies = [
+    "dvc",
+    "fsspec[arrow]",
+]
+files = [
+    {file = "dvc-hdfs-3.0.0.tar.gz", hash = "sha256:286443cb2c107ad53e73d8d6c4af8524b6e3b6b88b1543c8bc0544738aeb9fee"},
+    {file = "dvc_hdfs-3.0.0-py3-none-any.whl", hash = "sha256:00329d905eeed9942080f849afca00a2565d150749413d8bfedc5f387b5ea57b"},
+]
+
+[[package]]
+name = "dvc-http"
+version = "2.32.0"
+requires_python = ">=3.8"
+summary = "http plugin for dvc"
+groups = ["default"]
+dependencies = [
+    "aiohttp-retry>=2.5.0",
+    "fsspec[http]",
+]
+files = [
+    {file = "dvc-http-2.32.0.tar.gz", hash = "sha256:f714f8435634aab943c625f659ddac1188c6ddaf3ff161b39715b83ff39637fc"},
+    {file = "dvc_http-2.32.0-py3-none-any.whl", hash = "sha256:1bfd57a9eae3cbfa1db564d90d87003841921a644ab35f3f7735c641cc93d72e"},
+]
+
+[[package]]
+name = "dvc-objects"
+version = "5.1.0"
+requires_python = ">=3.9"
+summary = "dvc objects - filesystem and object-db level abstractions to use in dvc and dvc-data"
+groups = ["default"]
+dependencies = [
+    "fsspec>=2024.2.0",
+    "funcy>=1.14; python_version < \"3.12\"",
+]
+files = [
+    {file = "dvc-objects-5.1.0.tar.gz", hash = "sha256:22e919620f9ecf428a0d295efca8073d1c0e87206dd8e1f52b1d9520fa25b814"},
+    {file = "dvc_objects-5.1.0-py3-none-any.whl", hash = "sha256:c29b28f372674f53eca13323832d7b61c14bc29d516c39f6e87c5eba871a00ba"},
+]
+
+[[package]]
+name = "dvc-oss"
+version = "3.0.0"
+requires_python = ">=3.8"
+summary = "oss plugin for dvc"
+groups = ["default"]
+dependencies = [
+    "dvc",
+    "ossfs>=2023.12.0",
+]
+files = [
+    {file = "dvc-oss-3.0.0.tar.gz", hash = "sha256:1047f734022fcd2b96d32b06bf6e0921cd0a65810f7fc1e9b0fac29a147b6a9a"},
+    {file = "dvc_oss-3.0.0-py3-none-any.whl", hash = "sha256:7b9ef4804d9b3d9085c65fbb48de37c2fc4401938007afe3ef4a98589b8076e1"},
+]
+
+[[package]]
+name = "dvc-render"
+version = "1.0.2"
+requires_python = ">=3.9"
+summary = "Dvc Render"
+groups = ["default"]
+files = [
+    {file = "dvc-render-1.0.2.tar.gz", hash = "sha256:40d1cd81760daf34b48fa8362b5002fcbe415e3cdbcf42369b6347d01497ffc0"},
+    {file = "dvc_render-1.0.2-py3-none-any.whl", hash = "sha256:7e3e3cec1200fda41a99984190f14871f3cb878db7f94c853305056f69614ddb"},
+]
+
+[[package]]
+name = "dvc-s3"
+version = "3.2.0"
+requires_python = ">=3.9"
+summary = "s3 plugin for dvc"
+groups = ["default"]
+dependencies = [
+    "aiobotocore[boto3]>=2.5.0",
+    "dvc",
+    "flatten-dict<1,>=0.4.1",
+    "s3fs>=2023.6.0",
+]
+files = [
+    {file = "dvc_s3-3.2.0-py3-none-any.whl", hash = "sha256:036fa8b847349f14cf8ab5e789ae4eda47f50dd1eee487c83ee1c0902d647c25"},
+    {file = "dvc_s3-3.2.0.tar.gz", hash = "sha256:1d012ac1dce47659986f918123b48931cf9b3429ab0b4a22fd4b02448185ceb6"},
+]
+
+[[package]]
+name = "dvc-ssh"
+version = "4.2.1"
+requires_python = ">=3.9"
+summary = "ssh plugin for dvc"
+groups = ["default"]
+dependencies = [
+    "dvc",
+    "sshfs[bcrypt]>=2023.4.1",
+]
+files = [
+    {file = "dvc_ssh-4.2.1-py3-none-any.whl", hash = "sha256:102cadbd368eddfbf211b6dd8b43c16d2c4fc6486f587a8c53afe0055c8db977"},
+    {file = "dvc_ssh-4.2.1.tar.gz", hash = "sha256:95deae680200fbc9472bf4e32adae3b6618a8f9f38ed204c618bca28df8c912e"},
+]
+
+[[package]]
+name = "dvc-studio-client"
+version = "0.21.0"
+requires_python = ">=3.9"
+summary = "Small library to post data from DVC/DVCLive to Iterative Studio "
+groups = ["default"]
+dependencies = [
+    "dulwich",
+    "requests",
+    "voluptuous",
+]
+files = [
+    {file = "dvc_studio_client-0.21.0-py3-none-any.whl", hash = "sha256:93006e3812c830b42ff79746e6c6163e97a3c3ead6722ec2f1dec1d7dbf0b071"},
+    {file = "dvc_studio_client-0.21.0.tar.gz", hash = "sha256:db212ff5cf73dce886d0713a5d2bf4bc0bbfb499f3ca8548705ca98aab5addd1"},
+]
+
+[[package]]
+name = "dvc-task"
+version = "0.40.2"
+requires_python = ">=3.8"
+summary = "Extensible task queue used in DVC."
+groups = ["default"]
+dependencies = [
+    "celery<6,>=5.3.0",
+    "funcy>=1.17",
+    "kombu<6,>=5.3.0",
+    "pywin32>=225; sys_platform == \"win32\"",
+    "shortuuid>=1.0.8",
+]
+files = [
+    {file = "dvc_task-0.40.2-py3-none-any.whl", hash = "sha256:3891b94cf9d349072ee32ce47217b73530b1905e6dd5a1e378bd74afc8b4c030"},
+    {file = "dvc_task-0.40.2.tar.gz", hash = "sha256:909af541bf5fde83439da56c4c0ebac592af178a59b702708fadaacfd6e7b704"},
+]
+
+[[package]]
+name = "dvc-webdav"
+version = "3.0.0"
+requires_python = ">=3.8"
+summary = "webdav plugin for dvc"
+groups = ["default"]
+dependencies = [
+    "dvc",
+    "webdav4>=0.9.3",
+]
+files = [
+    {file = "dvc-webdav-3.0.0.tar.gz", hash = "sha256:65e7eef2ebc83415a8ddbdcb579bf219a3797c67e7a62d4568c5c82de2b6a508"},
+    {file = "dvc_webdav-3.0.0-py3-none-any.whl", hash = "sha256:90f19ae5bd6254723bea0a1b47bfafc636769f454777c4ef1d6a9d74dca4e525"},
+]
+
+[[package]]
+name = "dvc-webhdfs"
+version = "3.1.0"
+requires_python = ">=3.8"
+summary = "webhdfs plugin for dvc"
+groups = ["default"]
+dependencies = [
+    "dvc",
+    "fsspec>=2023.12.0",
+]
+files = [
+    {file = "dvc-webhdfs-3.1.0.tar.gz", hash = "sha256:6e894843d15ce766a05c616deda9d9bc361248e93bf9ea338b996e6e51ea0fea"},
+    {file = "dvc_webhdfs-3.1.0-py3-none-any.whl", hash = "sha256:4accff29551467f18443a0a066a46f414cb344dd9c553392c5644bd59c29658f"},
+]
+
+[[package]]
+name = "dvc"
+version = "3.59.2"
+extras = ["all"]
+requires_python = ">=3.9"
+summary = "Git for data scientists - manage your code and data together"
+groups = ["default"]
+dependencies = [
+    "dvc==3.59.2",
+    "dvc[azure,gdrive,gs,hdfs,oss,s3,ssh,webdav,webhdfs]",
+]
+files = [
+    {file = "dvc-3.59.2-py3-none-any.whl", hash = "sha256:1fe6ea628e6565b131b6c2911934b220f91dca1d7c60d2b19428c893d0573999"},
+    {file = "dvc-3.59.2.tar.gz", hash = "sha256:3eecc058b5d43e4e3ff7dfa72970a5c7d26e7b19f48395946ab314ce479bc1ce"},
+]
+
+[[package]]
+name = "dvc"
+version = "3.59.2"
+extras = ["azure", "gdrive", "gs", "hdfs", "oss", "s3", "ssh", "webdav", "webhdfs"]
+requires_python = ">=3.9"
+summary = "Git for data scientists - manage your code and data together"
+groups = ["default"]
+dependencies = [
+    "dvc-azure<4,>=3.1.0",
+    "dvc-gdrive<4,>=3",
+    "dvc-gs<4,>=3",
+    "dvc-hdfs<4,>=3",
+    "dvc-oss<4,>=3",
+    "dvc-s3<4,>=3.2.0",
+    "dvc-ssh<5,>=4",
+    "dvc-webdav<4,>=3",
+    "dvc-webhdfs<4,>=3.1",
+    "dvc==3.59.2",
+]
+files = [
+    {file = "dvc-3.59.2-py3-none-any.whl", hash = "sha256:1fe6ea628e6565b131b6c2911934b220f91dca1d7c60d2b19428c893d0573999"},
+    {file = "dvc-3.59.2.tar.gz", hash = "sha256:3eecc058b5d43e4e3ff7dfa72970a5c7d26e7b19f48395946ab314ce479bc1ce"},
+]
+
+[[package]]
 name = "ecdsa"
 version = "0.19.1"
 requires_python = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,>=2.6"
@@ -697,6 +1526,17 @@ dependencies = [
 files = [
     {file = "ecdsa-0.19.1-py2.py3-none-any.whl", hash = "sha256:30638e27cf77b7e15c4c4cc1973720149e1033827cfd00661ca5c8cc0cdb24c3"},
     {file = "ecdsa-0.19.1.tar.gz", hash = "sha256:478cba7b62555866fcb3bb3fe985e06decbdb68ef55713c4e5ab98c57d508e61"},
+]
+
+[[package]]
+name = "entrypoints"
+version = "0.4"
+requires_python = ">=3.6"
+summary = "Discover and load entry points from installed packages."
+groups = ["default"]
+files = [
+    {file = "entrypoints-0.4-py3-none-any.whl", hash = "sha256:f174b5ff827504fd3cd97cc3f8649f3693f51538c7e4bdf3ef002c8429d42f9f"},
+    {file = "entrypoints-0.4.tar.gz", hash = "sha256:b706eddaa9218a19ebcd67b56818f05bb27589b1ca9e8d797b74affad4ccacd4"},
 ]
 
 [[package]]
@@ -745,6 +1585,37 @@ groups = ["default"]
 files = [
     {file = "filelock-3.18.0-py3-none-any.whl", hash = "sha256:c401f4f8377c4464e6db25fff06205fd89bdd83b65eb0488ed1b160f780e21de"},
     {file = "filelock-3.18.0.tar.gz", hash = "sha256:adbc88eabb99d2fec8c9c1b229b171f18afa655400173ddc653d5d01501fb9f2"},
+]
+
+[[package]]
+name = "flatten-dict"
+version = "0.4.2"
+requires_python = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
+summary = "A flexible utility for flattening and unflattening dict-like objects in Python."
+groups = ["default"]
+dependencies = [
+    "importlib-metadata; python_version < \"3.8\"",
+    "pathlib2<3.0,>=2.3; python_version < \"3.4\"",
+    "six<2.0,>=1.12",
+]
+files = [
+    {file = "flatten-dict-0.4.2.tar.gz", hash = "sha256:506a96b6e6f805b81ae46a0f9f31290beb5fa79ded9d80dbe1b7fa236ab43076"},
+    {file = "flatten_dict-0.4.2-py2.py3-none-any.whl", hash = "sha256:7e245b20c4c718981212210eec4284a330c9f713e632e98765560e05421e48ad"},
+]
+
+[[package]]
+name = "flufl-lock"
+version = "8.2.0"
+requires_python = ">=3.9"
+summary = "NFS-safe file locking with timeouts for POSIX and Windows"
+groups = ["default"]
+dependencies = [
+    "atpublic",
+    "psutil",
+]
+files = [
+    {file = "flufl_lock-8.2.0-py3-none-any.whl", hash = "sha256:59361e277a50efceff288b8e9d36dd43254ad11a88d42d7716195b848a3fce7c"},
+    {file = "flufl_lock-8.2.0.tar.gz", hash = "sha256:15b333c35fab1a36b223840057258aeb4cd79f0fbaf82c144f23cdf6cf14d5e3"},
 ]
 
 [[package]]
@@ -806,6 +1677,84 @@ files = [
 ]
 
 [[package]]
+name = "fsspec"
+version = "2025.3.2"
+extras = ["arrow"]
+requires_python = ">=3.9"
+summary = "File-system specification"
+groups = ["default"]
+dependencies = [
+    "fsspec==2025.3.2",
+    "pyarrow>=1",
+]
+files = [
+    {file = "fsspec-2025.3.2-py3-none-any.whl", hash = "sha256:2daf8dc3d1dfa65b6aa37748d112773a7a08416f6c70d96b264c96476ecaf711"},
+    {file = "fsspec-2025.3.2.tar.gz", hash = "sha256:e52c77ef398680bbd6a98c0e628fbc469491282981209907bbc8aea76a04fdc6"},
+]
+
+[[package]]
+name = "fsspec"
+version = "2025.3.2"
+extras = ["http"]
+requires_python = ">=3.9"
+summary = "File-system specification"
+groups = ["default"]
+dependencies = [
+    "aiohttp!=4.0.0a0,!=4.0.0a1",
+    "fsspec==2025.3.2",
+]
+files = [
+    {file = "fsspec-2025.3.2-py3-none-any.whl", hash = "sha256:2daf8dc3d1dfa65b6aa37748d112773a7a08416f6c70d96b264c96476ecaf711"},
+    {file = "fsspec-2025.3.2.tar.gz", hash = "sha256:e52c77ef398680bbd6a98c0e628fbc469491282981209907bbc8aea76a04fdc6"},
+]
+
+[[package]]
+name = "fsspec"
+version = "2025.3.2"
+extras = ["tqdm"]
+requires_python = ">=3.9"
+summary = "File-system specification"
+groups = ["default"]
+dependencies = [
+    "fsspec==2025.3.2",
+    "tqdm",
+]
+files = [
+    {file = "fsspec-2025.3.2-py3-none-any.whl", hash = "sha256:2daf8dc3d1dfa65b6aa37748d112773a7a08416f6c70d96b264c96476ecaf711"},
+    {file = "fsspec-2025.3.2.tar.gz", hash = "sha256:e52c77ef398680bbd6a98c0e628fbc469491282981209907bbc8aea76a04fdc6"},
+]
+
+[[package]]
+name = "funcy"
+version = "2.0"
+summary = "A fancy and practical functional tools"
+groups = ["default"]
+files = [
+    {file = "funcy-2.0-py2.py3-none-any.whl", hash = "sha256:53df23c8bb1651b12f095df764bfb057935d49537a56de211b098f4c79614bb0"},
+    {file = "funcy-2.0.tar.gz", hash = "sha256:3963315d59d41c6f30c04bc910e10ab50a3ac4a225868bfa96feed133df075cb"},
+]
+
+[[package]]
+name = "gcsfs"
+version = "2025.3.2"
+requires_python = ">=3.9"
+summary = "Convenient Filesystem interface over GCS"
+groups = ["default"]
+dependencies = [
+    "aiohttp!=4.0.0a0,!=4.0.0a1",
+    "decorator>4.1.2",
+    "fsspec==2025.3.2",
+    "google-auth-oauthlib",
+    "google-auth>=1.2",
+    "google-cloud-storage",
+    "requests",
+]
+files = [
+    {file = "gcsfs-2025.3.2-py2.py3-none-any.whl", hash = "sha256:1bdecb530fbf3604a31f00f858a208e0770baf24d405a0b9df99fdde35737745"},
+    {file = "gcsfs-2025.3.2.tar.gz", hash = "sha256:fe300179492e63e309fecb11e4de7c15a51172eefa2b846d4b3659960216bba8"},
+]
+
+[[package]]
 name = "gitdb"
 version = "4.0.12"
 requires_python = ">=3.7"
@@ -832,6 +1781,171 @@ dependencies = [
 files = [
     {file = "GitPython-3.1.44-py3-none-any.whl", hash = "sha256:9e0e10cda9bed1ee64bc9a6de50e7e38a9c9943241cd7f585f6df3ed28011110"},
     {file = "gitpython-3.1.44.tar.gz", hash = "sha256:c87e30b26253bf5418b01b0660f818967f3c503193838337fe5e573331249269"},
+]
+
+[[package]]
+name = "google-api-core"
+version = "2.24.2"
+requires_python = ">=3.7"
+summary = "Google API client core library"
+groups = ["default"]
+dependencies = [
+    "google-auth<3.0.0,>=2.14.1",
+    "googleapis-common-protos<2.0.0,>=1.56.2",
+    "proto-plus<2.0.0,>=1.22.3",
+    "proto-plus<2.0.0,>=1.25.0; python_version >= \"3.13\"",
+    "protobuf!=3.20.0,!=3.20.1,!=4.21.0,!=4.21.1,!=4.21.2,!=4.21.3,!=4.21.4,!=4.21.5,<7.0.0,>=3.19.5",
+    "requests<3.0.0,>=2.18.0",
+]
+files = [
+    {file = "google_api_core-2.24.2-py3-none-any.whl", hash = "sha256:810a63ac95f3c441b7c0e43d344e372887f62ce9071ba972eacf32672e072de9"},
+    {file = "google_api_core-2.24.2.tar.gz", hash = "sha256:81718493daf06d96d6bc76a91c23874dbf2fac0adbbf542831b805ee6e974696"},
+]
+
+[[package]]
+name = "google-api-python-client"
+version = "2.169.0"
+requires_python = ">=3.7"
+summary = "Google API Client Library for Python"
+groups = ["default"]
+dependencies = [
+    "google-api-core!=2.0.*,!=2.1.*,!=2.2.*,!=2.3.0,<3.0.0,>=1.31.5",
+    "google-auth!=2.24.0,!=2.25.0,<3.0.0,>=1.32.0",
+    "google-auth-httplib2<1.0.0,>=0.2.0",
+    "httplib2<1.0.0,>=0.19.0",
+    "uritemplate<5,>=3.0.1",
+]
+files = [
+    {file = "google_api_python_client-2.169.0-py3-none-any.whl", hash = "sha256:dae3e882dc0e6f28e60cf09c1f13fedfd881db84f824dd418aa9e44def2fe00d"},
+    {file = "google_api_python_client-2.169.0.tar.gz", hash = "sha256:0585bb97bd5f5bf3ed8d4bf624593e4c5a14d06c811d1952b07a1f94b4d12c51"},
+]
+
+[[package]]
+name = "google-auth"
+version = "2.40.1"
+requires_python = ">=3.7"
+summary = "Google Authentication Library"
+groups = ["default"]
+dependencies = [
+    "cachetools<6.0,>=2.0.0",
+    "pyasn1-modules>=0.2.1",
+    "rsa<5,>=3.1.4",
+]
+files = [
+    {file = "google_auth-2.40.1-py2.py3-none-any.whl", hash = "sha256:ed4cae4f5c46b41bae1d19c036e06f6c371926e97b19e816fc854eff811974ee"},
+    {file = "google_auth-2.40.1.tar.gz", hash = "sha256:58f0e8416a9814c1d86c9b7f6acf6816b51aba167b2c76821965271bac275540"},
+]
+
+[[package]]
+name = "google-auth-httplib2"
+version = "0.2.0"
+summary = "Google Authentication Library: httplib2 transport"
+groups = ["default"]
+dependencies = [
+    "google-auth",
+    "httplib2>=0.19.0",
+]
+files = [
+    {file = "google-auth-httplib2-0.2.0.tar.gz", hash = "sha256:38aa7badf48f974f1eb9861794e9c0cb2a0511a4ec0679b1f886d108f5640e05"},
+    {file = "google_auth_httplib2-0.2.0-py2.py3-none-any.whl", hash = "sha256:b65a0a2123300dd71281a7bf6e64d65a0759287df52729bdd1ae2e47dc311a3d"},
+]
+
+[[package]]
+name = "google-auth-oauthlib"
+version = "1.2.2"
+requires_python = ">=3.6"
+summary = "Google Authentication Library"
+groups = ["default"]
+dependencies = [
+    "google-auth>=2.15.0",
+    "requests-oauthlib>=0.7.0",
+]
+files = [
+    {file = "google_auth_oauthlib-1.2.2-py3-none-any.whl", hash = "sha256:fd619506f4b3908b5df17b65f39ca8d66ea56986e5472eb5978fd8f3786f00a2"},
+    {file = "google_auth_oauthlib-1.2.2.tar.gz", hash = "sha256:11046fb8d3348b296302dd939ace8af0a724042e8029c1b872d87fabc9f41684"},
+]
+
+[[package]]
+name = "google-cloud-core"
+version = "2.4.3"
+requires_python = ">=3.7"
+summary = "Google Cloud API client core library"
+groups = ["default"]
+dependencies = [
+    "google-api-core!=2.0.*,!=2.1.*,!=2.2.*,!=2.3.0,<3.0.0dev,>=1.31.6",
+    "google-auth<3.0dev,>=1.25.0",
+    "importlib-metadata>1.0.0; python_version < \"3.8\"",
+]
+files = [
+    {file = "google_cloud_core-2.4.3-py2.py3-none-any.whl", hash = "sha256:5130f9f4c14b4fafdff75c79448f9495cfade0d8775facf1b09c3bf67e027f6e"},
+    {file = "google_cloud_core-2.4.3.tar.gz", hash = "sha256:1fab62d7102844b278fe6dead3af32408b1df3eb06f5c7e8634cbd40edc4da53"},
+]
+
+[[package]]
+name = "google-cloud-storage"
+version = "3.1.0"
+requires_python = ">=3.7"
+summary = "Google Cloud Storage API client library"
+groups = ["default"]
+dependencies = [
+    "google-api-core<3.0.0dev,>=2.15.0",
+    "google-auth<3.0dev,>=2.26.1",
+    "google-cloud-core<3.0dev,>=2.4.2",
+    "google-crc32c<2.0dev,>=1.0",
+    "google-resumable-media>=2.7.2",
+    "requests<3.0.0dev,>=2.18.0",
+]
+files = [
+    {file = "google_cloud_storage-3.1.0-py2.py3-none-any.whl", hash = "sha256:eaf36966b68660a9633f03b067e4a10ce09f1377cae3ff9f2c699f69a81c66c6"},
+    {file = "google_cloud_storage-3.1.0.tar.gz", hash = "sha256:944273179897c7c8a07ee15f2e6466a02da0c7c4b9ecceac2a26017cb2972049"},
+]
+
+[[package]]
+name = "google-crc32c"
+version = "1.7.1"
+requires_python = ">=3.9"
+summary = "A python wrapper of the C library 'Google CRC32C'"
+groups = ["default"]
+dependencies = [
+    "importlib-resources>=1.3; python_version < \"3.9\" and os_name == \"nt\"",
+]
+files = [
+    {file = "google_crc32c-1.7.1-cp311-cp311-macosx_12_0_arm64.whl", hash = "sha256:6fbab4b935989e2c3610371963ba1b86afb09537fd0c633049be82afe153ac06"},
+    {file = "google_crc32c-1.7.1-cp311-cp311-macosx_12_0_x86_64.whl", hash = "sha256:ed66cbe1ed9cbaaad9392b5259b3eba4a9e565420d734e6238813c428c3336c9"},
+    {file = "google_crc32c-1.7.1-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:ee6547b657621b6cbed3562ea7826c3e11cab01cd33b74e1f677690652883e77"},
+    {file = "google_crc32c-1.7.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:d68e17bad8f7dd9a49181a1f5a8f4b251c6dbc8cc96fb79f1d321dfd57d66f53"},
+    {file = "google_crc32c-1.7.1-cp311-cp311-win_amd64.whl", hash = "sha256:6335de12921f06e1f774d0dd1fbea6bf610abe0887a1638f64d694013138be5d"},
+    {file = "google_crc32c-1.7.1-pp311-pypy311_pp73-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:85fef7fae11494e747c9fd1359a527e5970fc9603c90764843caabd3a16a0a48"},
+    {file = "google_crc32c-1.7.1-pp311-pypy311_pp73-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:6efb97eb4369d52593ad6f75e7e10d053cf00c48983f7a973105bc70b0ac4d82"},
+    {file = "google_crc32c-1.7.1.tar.gz", hash = "sha256:2bff2305f98846f3e825dbeec9ee406f89da7962accdb29356e4eadc251bd472"},
+]
+
+[[package]]
+name = "google-resumable-media"
+version = "2.7.2"
+requires_python = ">=3.7"
+summary = "Utilities for Google Media Downloads and Resumable Uploads"
+groups = ["default"]
+dependencies = [
+    "google-crc32c<2.0dev,>=1.0",
+]
+files = [
+    {file = "google_resumable_media-2.7.2-py2.py3-none-any.whl", hash = "sha256:3ce7551e9fe6d99e9a126101d2536612bb73486721951e9562fee0f90c6ababa"},
+    {file = "google_resumable_media-2.7.2.tar.gz", hash = "sha256:5280aed4629f2b60b847b0d42f9857fd4935c11af266744df33d8074cae92fe0"},
+]
+
+[[package]]
+name = "googleapis-common-protos"
+version = "1.70.0"
+requires_python = ">=3.7"
+summary = "Common protobufs used in Google APIs"
+groups = ["default"]
+dependencies = [
+    "protobuf!=4.21.1,!=4.21.2,!=4.21.3,!=4.21.4,!=4.21.5,<7.0.0,>=3.20.2",
+]
+files = [
+    {file = "googleapis_common_protos-1.70.0-py3-none-any.whl", hash = "sha256:b8bfcca8c25a2bb253e0e0b0adaf8c00773e5e6af6fd92397576680b807e0fd8"},
+    {file = "googleapis_common_protos-1.70.0.tar.gz", hash = "sha256:0e1b44e0ea153e6594f9f394fef15193a68aaaea2d843f83e2742717ca753257"},
 ]
 
 [[package]]
@@ -864,6 +1978,19 @@ dependencies = [
 files = [
     {file = "gql-3.5.2-py2.py3-none-any.whl", hash = "sha256:c830ffc38b3997b2a146317b27758305ab3d0da3bde607b49f34e32affb23ba2"},
     {file = "gql-3.5.2.tar.gz", hash = "sha256:07e1325b820c8ba9478e95de27ce9f23250486e7e79113dbb7659a442dc13e74"},
+]
+
+[[package]]
+name = "grandalf"
+version = "0.8"
+summary = "Graph and drawing algorithms framework"
+groups = ["default"]
+dependencies = [
+    "pyparsing",
+]
+files = [
+    {file = "grandalf-0.8-py3-none-any.whl", hash = "sha256:793ca254442f4a79252ea9ff1ab998e852c1e071b863593e5383afee906b4185"},
+    {file = "grandalf-0.8.tar.gz", hash = "sha256:2813f7aab87f0d20f334a3162ccfbcbf085977134a17a5b516940a93a77ea974"},
 ]
 
 [[package]]
@@ -967,6 +2094,28 @@ files = [
 ]
 
 [[package]]
+name = "gto"
+version = "1.7.2"
+requires_python = ">=3.9"
+summary = "Version and deploy your models following GitOps principles"
+groups = ["default"]
+dependencies = [
+    "entrypoints",
+    "funcy",
+    "pydantic!=2.0.0,<3,>=1.9.0",
+    "rich",
+    "ruamel-yaml",
+    "scmrepo<4,>=3",
+    "semver>=2.13.0",
+    "tabulate>=0.8.10",
+    "typer>=0.4.1",
+]
+files = [
+    {file = "gto-1.7.2-py3-none-any.whl", hash = "sha256:c893e5cf35ef0ffe22d342498f25c85b38f2cc507500e41b5e00d254feda1c1c"},
+    {file = "gto-1.7.2.tar.gz", hash = "sha256:98994f43d02ef6d4e77c4087b1c0c70a038e4a753a5583c23116246d33b89742"},
+]
+
+[[package]]
 name = "h11"
 version = "0.16.0"
 requires_python = ">=3.8"
@@ -1005,6 +2154,36 @@ files = [
 ]
 
 [[package]]
+name = "httpcore"
+version = "1.0.9"
+requires_python = ">=3.8"
+summary = "A minimal low-level HTTP client."
+groups = ["default"]
+dependencies = [
+    "certifi",
+    "h11>=0.16",
+]
+files = [
+    {file = "httpcore-1.0.9-py3-none-any.whl", hash = "sha256:2d400746a40668fc9dec9810239072b40b4484b640a8c38fd654a024c7a1bf55"},
+    {file = "httpcore-1.0.9.tar.gz", hash = "sha256:6e34463af53fd2ab5d807f399a9b45ea31c3dfa2276f15a2c3f00afff6e176e8"},
+]
+
+[[package]]
+name = "httplib2"
+version = "0.22.0"
+requires_python = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+summary = "A comprehensive HTTP client library."
+groups = ["default"]
+dependencies = [
+    "pyparsing!=3.0.0,!=3.0.1,!=3.0.2,!=3.0.3,<4,>=2.4.2; python_version > \"3.0\"",
+    "pyparsing<3,>=2.4.2; python_version < \"3.0\"",
+]
+files = [
+    {file = "httplib2-0.22.0-py3-none-any.whl", hash = "sha256:14ae0a53c1ba8f3d37e9e27cf37eabb0fb9980f435ba405d546948b009dd64dc"},
+    {file = "httplib2-0.22.0.tar.gz", hash = "sha256:d7a10bc5ef5ab08322488bde8c726eeee5c8618723fdb399597ec58f3d82df81"},
+]
+
+[[package]]
 name = "httptools"
 version = "0.6.4"
 requires_python = ">=3.8.0"
@@ -1019,6 +2198,23 @@ files = [
     {file = "httptools-0.6.4-cp311-cp311-musllinux_1_2_x86_64.whl", hash = "sha256:dacdd3d10ea1b4ca9df97a0a303cbacafc04b5cd375fa98732678151643d4988"},
     {file = "httptools-0.6.4-cp311-cp311-win_amd64.whl", hash = "sha256:288cd628406cc53f9a541cfaf06041b4c71d751856bab45e3702191f931ccd17"},
     {file = "httptools-0.6.4.tar.gz", hash = "sha256:4e93eee4add6493b59a5c514da98c939b244fce4a0d8879cd3f466562f4b7d5c"},
+]
+
+[[package]]
+name = "httpx"
+version = "0.28.1"
+requires_python = ">=3.8"
+summary = "The next generation HTTP client."
+groups = ["default"]
+dependencies = [
+    "anyio",
+    "certifi",
+    "httpcore==1.*",
+    "idna",
+]
+files = [
+    {file = "httpx-0.28.1-py3-none-any.whl", hash = "sha256:d909fcccc110f8c7faf814ca82a9a4d816bc5a6dbfea25d6591d6985b8ba59ad"},
+    {file = "httpx-0.28.1.tar.gz", hash = "sha256:75e98c5f16b0f35b567856f597f06ff2270a374470a5c2392242528e3e3e42fc"},
 ]
 
 [[package]]
@@ -1055,6 +2251,22 @@ dependencies = [
 files = [
     {file = "humanfriendly-10.0-py2.py3-none-any.whl", hash = "sha256:1697e1a8a8f550fd43c2865cd84542fc175a61dcb779b6fee18cf6b6ccba1477"},
     {file = "humanfriendly-10.0.tar.gz", hash = "sha256:6b0b831ce8f15f7300721aa49829fc4e83921a9a301cc7f606be6686a2288ddc"},
+]
+
+[[package]]
+name = "hydra-core"
+version = "1.3.2"
+summary = "A framework for elegantly configuring complex applications"
+groups = ["default"]
+dependencies = [
+    "antlr4-python3-runtime==4.9.*",
+    "importlib-resources; python_version < \"3.9\"",
+    "omegaconf<2.4,>=2.2",
+    "packaging",
+]
+files = [
+    {file = "hydra-core-1.3.2.tar.gz", hash = "sha256:8a878ed67216997c3e9d88a8e72e7b4767e81af37afb4ea3334b269a4390a824"},
+    {file = "hydra_core-1.3.2-py3-none-any.whl", hash = "sha256:fa0238a9e31df3373b35b0bfb672c34cc92718d21f81311d8996a16de1141d8b"},
 ]
 
 [[package]]
@@ -1189,6 +2401,34 @@ files = [
 ]
 
 [[package]]
+name = "isodate"
+version = "0.7.2"
+requires_python = ">=3.7"
+summary = "An ISO 8601 date/time/duration parser and formatter"
+groups = ["default"]
+files = [
+    {file = "isodate-0.7.2-py3-none-any.whl", hash = "sha256:28009937d8031054830160fce6d409ed342816b543597cece116d966c6d99e15"},
+    {file = "isodate-0.7.2.tar.gz", hash = "sha256:4cd1aa0f43ca76f4a6c6c0292a85f40b35ec2e43e315b59f06e6d32171a953e6"},
+]
+
+[[package]]
+name = "iterative-telemetry"
+version = "0.0.10"
+requires_python = ">=3.8"
+summary = "Common library for sending telemetry"
+groups = ["default"]
+dependencies = [
+    "appdirs",
+    "distro",
+    "filelock",
+    "requests",
+]
+files = [
+    {file = "iterative_telemetry-0.0.10-py3-none-any.whl", hash = "sha256:e58ffb60d22c3de8dad6a114697cc61f6c14911cae484bf90df394e0d6553603"},
+    {file = "iterative_telemetry-0.0.10.tar.gz", hash = "sha256:7fde6111de6fa4acf5a95a6190cc9cc5d17d835a815f0a18ece201f6031f4ed6"},
+]
+
+[[package]]
 name = "jedi"
 version = "0.19.2"
 requires_python = ">=3.6"
@@ -1214,6 +2454,17 @@ dependencies = [
 files = [
     {file = "jinja2-3.1.6-py3-none-any.whl", hash = "sha256:85ece4451f492d0c13c5dd7c13a64681a86afae63a5f347908daf103ce6d2f67"},
     {file = "jinja2-3.1.6.tar.gz", hash = "sha256:0137fb05990d35f1275a587e9aee6d56da821fc83491a0fb838183be43f66d6d"},
+]
+
+[[package]]
+name = "jmespath"
+version = "0.10.0"
+requires_python = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
+summary = "JSON Matching Expressions"
+groups = ["default"]
+files = [
+    {file = "jmespath-0.10.0-py2.py3-none-any.whl", hash = "sha256:cdf6525904cc597730141d61b36f2e4b8ecc257c420fa2f4549bac2c2d0cb72f"},
+    {file = "jmespath-0.10.0.tar.gz", hash = "sha256:b85d0567b8666149a93172712e68920734333c0ce7e89b78b3e987f71e5ed4f9"},
 ]
 
 [[package]]
@@ -1349,6 +2600,41 @@ files = [
 ]
 
 [[package]]
+name = "knack"
+version = "0.12.0"
+summary = "A Command-Line Interface framework"
+groups = ["default"]
+dependencies = [
+    "argcomplete",
+    "jmespath",
+    "packaging",
+    "pygments",
+    "pyyaml",
+    "tabulate",
+]
+files = [
+    {file = "knack-0.12.0-py3-none-any.whl", hash = "sha256:c1c3e8555f5aa974880f580ad7c862502b6ef274b1c9891ae0cc17f8eaa5c8b5"},
+    {file = "knack-0.12.0.tar.gz", hash = "sha256:71f2a6b42ae9a302e43243320fa05edb09b19339fcf1f331f5b6d07bf97f5291"},
+]
+
+[[package]]
+name = "kombu"
+version = "5.5.3"
+requires_python = ">=3.8"
+summary = "Messaging library for Python."
+groups = ["default"]
+dependencies = [
+    "amqp<6.0.0,>=5.1.1",
+    "backports-zoneinfo[tzdata]>=0.2.1; python_version < \"3.9\"",
+    "tzdata>=2025.2; python_version >= \"3.9\"",
+    "vine==5.1.0",
+]
+files = [
+    {file = "kombu-5.5.3-py3-none-any.whl", hash = "sha256:5b0dbceb4edee50aa464f59469d34b97864be09111338cfb224a10b6a163909b"},
+    {file = "kombu-5.5.3.tar.gz", hash = "sha256:021a0e11fcfcd9b0260ef1fb64088c0e92beb976eb59c1dfca7ddd4ad4562ea2"},
+]
+
+[[package]]
 name = "llvmlite"
 version = "0.44.0"
 requires_python = ">=3.10"
@@ -1471,6 +2757,36 @@ groups = ["default"]
 files = [
     {file = "mpmath-1.3.0-py3-none-any.whl", hash = "sha256:a0b2b9fe80bbcd81a6647ff13108738cfb482d481d826cc0e02f5b35e5c88d2c"},
     {file = "mpmath-1.3.0.tar.gz", hash = "sha256:7a28eb2a9774d00c7bc92411c19a89209d5da7c4c9a9e227be8330a23a25b91f"},
+]
+
+[[package]]
+name = "msal"
+version = "1.32.3"
+requires_python = ">=3.7"
+summary = "The Microsoft Authentication Library (MSAL) for Python library enables your app to access the Microsoft Cloud by supporting authentication of users with Microsoft Azure Active Directory accounts (AAD) and Microsoft Accounts (MSA) using industry standard OAuth2 and OpenID Connect."
+groups = ["default"]
+dependencies = [
+    "PyJWT[crypto]<3,>=1.0.0",
+    "cryptography<47,>=2.5",
+    "requests<3,>=2.0.0",
+]
+files = [
+    {file = "msal-1.32.3-py3-none-any.whl", hash = "sha256:b2798db57760b1961b142f027ffb7c8169536bf77316e99a0df5c4aaebb11569"},
+    {file = "msal-1.32.3.tar.gz", hash = "sha256:5eea038689c78a5a70ca8ecbe1245458b55a857bd096efb6989c69ba15985d35"},
+]
+
+[[package]]
+name = "msal-extensions"
+version = "1.3.1"
+requires_python = ">=3.9"
+summary = "Microsoft Authentication Library extensions (MSAL EX) provides a persistence API that can save your data on disk, encrypted on Windows, macOS and Linux. Concurrent data access will be coordinated by a file lock mechanism."
+groups = ["default"]
+dependencies = [
+    "msal<2,>=1.29",
+]
+files = [
+    {file = "msal_extensions-1.3.1-py3-none-any.whl", hash = "sha256:96d3de4d034504e969ac5e85bae8106c8373b5c6568e4c8fa7af2eca9dbe6bca"},
+    {file = "msal_extensions-1.3.1.tar.gz", hash = "sha256:c5b0fd10f65ef62b5f1d62f4251d51cbcaf003fcedae8c91b040a488614be1a4"},
 ]
 
 [[package]]
@@ -1840,6 +3156,109 @@ files = [
 ]
 
 [[package]]
+name = "oauth2client"
+version = "4.1.3"
+summary = "OAuth 2.0 client library"
+groups = ["default"]
+dependencies = [
+    "httplib2>=0.9.1",
+    "pyasn1-modules>=0.0.5",
+    "pyasn1>=0.1.7",
+    "rsa>=3.1.4",
+    "six>=1.6.1",
+]
+files = [
+    {file = "oauth2client-4.1.3-py2.py3-none-any.whl", hash = "sha256:b8a81cc5d60e2d364f0b1b98f958dbd472887acaf1a5b05e21c28c31a2d6d3ac"},
+    {file = "oauth2client-4.1.3.tar.gz", hash = "sha256:d486741e451287f69568a4d26d70d9acd73a2bbfa275746c535b4209891cccc6"},
+]
+
+[[package]]
+name = "oauthlib"
+version = "3.2.2"
+requires_python = ">=3.6"
+summary = "A generic, spec-compliant, thorough implementation of the OAuth request-signing logic"
+groups = ["default"]
+files = [
+    {file = "oauthlib-3.2.2-py3-none-any.whl", hash = "sha256:8139f29aac13e25d502680e9e19963e83f16838d48a0d71c287fe40e7067fbca"},
+    {file = "oauthlib-3.2.2.tar.gz", hash = "sha256:9859c40929662bec5d64f34d01c99e093149682a3f38915dc0655d5a633dd918"},
+]
+
+[[package]]
+name = "omegaconf"
+version = "2.3.0"
+requires_python = ">=3.6"
+summary = "A flexible configuration library"
+groups = ["default"]
+dependencies = [
+    "PyYAML>=5.1.0",
+    "antlr4-python3-runtime==4.9.*",
+    "dataclasses; python_version == \"3.6\"",
+]
+files = [
+    {file = "omegaconf-2.3.0-py3-none-any.whl", hash = "sha256:7b4df175cdb08ba400f45cae3bdcae7ba8365db4d165fc65fd04b050ab63b46b"},
+    {file = "omegaconf-2.3.0.tar.gz", hash = "sha256:d5d4b6d29955cc50ad50c46dc269bcd92c6e00f5f90d23ab5fee7bfca4ba4cc7"},
+]
+
+[[package]]
+name = "orjson"
+version = "3.10.18"
+requires_python = ">=3.9"
+summary = "Fast, correct Python JSON library supporting dataclasses, datetimes, and numpy"
+groups = ["default"]
+marker = "implementation_name == \"cpython\""
+files = [
+    {file = "orjson-3.10.18-cp311-cp311-macosx_10_15_x86_64.macosx_11_0_arm64.macosx_10_15_universal2.whl", hash = "sha256:e0a183ac3b8e40471e8d843105da6fbe7c070faab023be3b08188ee3f85719b8"},
+    {file = "orjson-3.10.18-cp311-cp311-macosx_15_0_arm64.whl", hash = "sha256:5ef7c164d9174362f85238d0cd4afdeeb89d9e523e4651add6a5d458d6f7d42d"},
+    {file = "orjson-3.10.18-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:afd14c5d99cdc7bf93f22b12ec3b294931518aa019e2a147e8aa2f31fd3240f7"},
+    {file = "orjson-3.10.18-cp311-cp311-manylinux_2_17_armv7l.manylinux2014_armv7l.whl", hash = "sha256:7b672502323b6cd133c4af6b79e3bea36bad2d16bca6c1f645903fce83909a7a"},
+    {file = "orjson-3.10.18-cp311-cp311-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:51f8c63be6e070ec894c629186b1c0fe798662b8687f3d9fdfa5e401c6bd7679"},
+    {file = "orjson-3.10.18-cp311-cp311-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:3f9478ade5313d724e0495d167083c6f3be0dd2f1c9c8a38db9a9e912cdaf947"},
+    {file = "orjson-3.10.18-cp311-cp311-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:187aefa562300a9d382b4b4eb9694806e5848b0cedf52037bb5c228c61bb66d4"},
+    {file = "orjson-3.10.18-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:9da552683bc9da222379c7a01779bddd0ad39dd699dd6300abaf43eadee38334"},
+    {file = "orjson-3.10.18-cp311-cp311-musllinux_1_2_aarch64.whl", hash = "sha256:e450885f7b47a0231979d9c49b567ed1c4e9f69240804621be87c40bc9d3cf17"},
+    {file = "orjson-3.10.18-cp311-cp311-musllinux_1_2_armv7l.whl", hash = "sha256:5e3c9cc2ba324187cd06287ca24f65528f16dfc80add48dc99fa6c836bb3137e"},
+    {file = "orjson-3.10.18-cp311-cp311-musllinux_1_2_i686.whl", hash = "sha256:50ce016233ac4bfd843ac5471e232b865271d7d9d44cf9d33773bcd883ce442b"},
+    {file = "orjson-3.10.18-cp311-cp311-musllinux_1_2_x86_64.whl", hash = "sha256:b3ceff74a8f7ffde0b2785ca749fc4e80e4315c0fd887561144059fb1c138aa7"},
+    {file = "orjson-3.10.18-cp311-cp311-win32.whl", hash = "sha256:fdba703c722bd868c04702cac4cb8c6b8ff137af2623bc0ddb3b3e6a2c8996c1"},
+    {file = "orjson-3.10.18-cp311-cp311-win_amd64.whl", hash = "sha256:c28082933c71ff4bc6ccc82a454a2bffcef6e1d7379756ca567c772e4fb3278a"},
+    {file = "orjson-3.10.18-cp311-cp311-win_arm64.whl", hash = "sha256:a6c7c391beaedd3fa63206e5c2b7b554196f14debf1ec9deb54b5d279b1b46f5"},
+    {file = "orjson-3.10.18.tar.gz", hash = "sha256:e8da3947d92123eda795b68228cafe2724815621fe35e8e320a9e9593a4bcd53"},
+]
+
+[[package]]
+name = "oss2"
+version = "2.18.4"
+summary = "Aliyun OSS (Object Storage Service) SDK"
+groups = ["default"]
+dependencies = [
+    "aliyun-python-sdk-core>=2.13.12",
+    "aliyun-python-sdk-kms>=2.4.1",
+    "crcmod>=1.7",
+    "pycryptodome>=3.4.7",
+    "requests!=2.9.0",
+    "six",
+]
+files = [
+    {file = "oss2-2.18.4.tar.gz", hash = "sha256:be1e7a871a8cc267726367333017d78333ee8fae88c727ad61396f59c1c0e4d0"},
+]
+
+[[package]]
+name = "ossfs"
+version = "2025.5.0"
+requires_python = ">=3.8"
+summary = "fsspec filesystem for OSS"
+groups = ["default"]
+dependencies = [
+    "aiooss2>=0.2.11",
+    "fsspec>=2023.9.2",
+    "oss2==2.18.4",
+]
+files = [
+    {file = "ossfs-2025.5.0-py3-none-any.whl", hash = "sha256:17b92e5cfd636690665969687806ddba0155ab71245a731eb86b17f4c2648dc2"},
+    {file = "ossfs-2025.5.0.tar.gz", hash = "sha256:722e7044fbcd84cc992e5cd6821d5f19bed334216c140d6e46ffb21979d49ce0"},
+]
+
+[[package]]
 name = "packaging"
 version = "24.2"
 requires_python = ">=3.8"
@@ -1894,6 +3313,17 @@ groups = ["default"]
 files = [
     {file = "passlib-1.7.4-py2.py3-none-any.whl", hash = "sha256:aa6bca462b8d8bda89c70b382f0c298a20b5560af6cbfa2dce410c0a2fb669f1"},
     {file = "passlib-1.7.4.tar.gz", hash = "sha256:defd50f72b65c5402ab2c573830a6978e5f202ad0d984793c8dde2c4152ebe04"},
+]
+
+[[package]]
+name = "pathspec"
+version = "0.12.1"
+requires_python = ">=3.8"
+summary = "Utility library for gitignore style pattern matching of file paths."
+groups = ["default"]
+files = [
+    {file = "pathspec-0.12.1-py3-none-any.whl", hash = "sha256:a0d503e138a4c123b27490a4f7beda6a01c6f288df0e4a8b79c7eb0dc7b4cc08"},
+    {file = "pathspec-0.12.1.tar.gz", hash = "sha256:a482d51503a1ab33b1c67a6c3813a26953dbdc71c31dacaef9a838c4e29f5712"},
 ]
 
 [[package]]
@@ -2081,6 +3511,20 @@ files = [
 ]
 
 [[package]]
+name = "proto-plus"
+version = "1.26.1"
+requires_python = ">=3.7"
+summary = "Beautiful, Pythonic protocol buffers"
+groups = ["default"]
+dependencies = [
+    "protobuf<7.0.0,>=3.19.0",
+]
+files = [
+    {file = "proto_plus-1.26.1-py3-none-any.whl", hash = "sha256:13285478c2dcf2abb829db158e1047e2f1e8d63a077d94263c2b88b043c75a66"},
+    {file = "proto_plus-1.26.1.tar.gz", hash = "sha256:21a515a4c4c0088a773899e23c7bbade3d18f9c66c73edd4c7ee3816bc96a012"},
+]
+
+[[package]]
 name = "protobuf"
 version = "5.29.4"
 requires_python = ">=3.8"
@@ -2183,6 +3627,20 @@ files = [
 ]
 
 [[package]]
+name = "pyasn1-modules"
+version = "0.4.1"
+requires_python = ">=3.8"
+summary = "A collection of ASN.1-based protocols modules"
+groups = ["default"]
+dependencies = [
+    "pyasn1<0.7.0,>=0.4.6",
+]
+files = [
+    {file = "pyasn1_modules-0.4.1-py3-none-any.whl", hash = "sha256:49bfa96b45a292b711e986f222502c1c9a5e1f4e568fc30e2574a6c7d07838fd"},
+    {file = "pyasn1_modules-0.4.1.tar.gz", hash = "sha256:c28e2dbf9c06ad61c71a075c7e0f9fd0f1b0bb2d2ad4377f240d33ac2ab60a7c"},
+]
+
+[[package]]
 name = "pycparser"
 version = "2.22"
 requires_python = ">=3.8"
@@ -2191,6 +3649,27 @@ groups = ["default"]
 files = [
     {file = "pycparser-2.22-py3-none-any.whl", hash = "sha256:c3702b6d3dd8c7abc1afa565d7e63d53a1d0bd86cdc24edd75470f4de499cfcc"},
     {file = "pycparser-2.22.tar.gz", hash = "sha256:491c8be9c040f5390f5bf44a5b07752bd07f56edf992381b05c701439eec10f6"},
+]
+
+[[package]]
+name = "pycryptodome"
+version = "3.23.0"
+requires_python = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,!=3.6.*,>=2.7"
+summary = "Cryptographic library for Python"
+groups = ["default"]
+files = [
+    {file = "pycryptodome-3.23.0-cp37-abi3-macosx_10_9_universal2.whl", hash = "sha256:187058ab80b3281b1de11c2e6842a357a1f71b42cb1e15bce373f3d238135c27"},
+    {file = "pycryptodome-3.23.0-cp37-abi3-macosx_10_9_x86_64.whl", hash = "sha256:cfb5cd445280c5b0a4e6187a7ce8de5a07b5f3f897f235caa11f1f435f182843"},
+    {file = "pycryptodome-3.23.0-cp37-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:67bd81fcbe34f43ad9422ee8fd4843c8e7198dd88dd3d40e6de42ee65fbe1490"},
+    {file = "pycryptodome-3.23.0-cp37-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:c8987bd3307a39bc03df5c8e0e3d8be0c4c3518b7f044b0f4c15d1aa78f52575"},
+    {file = "pycryptodome-3.23.0-cp37-abi3-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:aa0698f65e5b570426fc31b8162ed4603b0c2841cbb9088e2b01641e3065915b"},
+    {file = "pycryptodome-3.23.0-cp37-abi3-musllinux_1_2_aarch64.whl", hash = "sha256:53ecbafc2b55353edcebd64bf5da94a2a2cdf5090a6915bcca6eca6cc452585a"},
+    {file = "pycryptodome-3.23.0-cp37-abi3-musllinux_1_2_i686.whl", hash = "sha256:156df9667ad9f2ad26255926524e1c136d6664b741547deb0a86a9acf5ea631f"},
+    {file = "pycryptodome-3.23.0-cp37-abi3-musllinux_1_2_x86_64.whl", hash = "sha256:dea827b4d55ee390dc89b2afe5927d4308a8b538ae91d9c6f7a5090f397af1aa"},
+    {file = "pycryptodome-3.23.0-cp37-abi3-win32.whl", hash = "sha256:507dbead45474b62b2bbe318eb1c4c8ee641077532067fec9c1aa82c31f84886"},
+    {file = "pycryptodome-3.23.0-cp37-abi3-win_amd64.whl", hash = "sha256:c75b52aacc6c0c260f204cbdd834f76edc9fb0d8e0da9fbf8352ef58202564e2"},
+    {file = "pycryptodome-3.23.0-cp37-abi3-win_arm64.whl", hash = "sha256:11eeeb6917903876f134b56ba11abe95c0b0fd5e3330def218083c7d98bbcb3c"},
+    {file = "pycryptodome-3.23.0.tar.gz", hash = "sha256:447700a657182d60338bab09fdb27518f8856aecd80ae4c6bdddb67ff5da44ef"},
 ]
 
 [[package]]
@@ -2262,6 +3741,79 @@ files = [
 ]
 
 [[package]]
+name = "pydot"
+version = "4.0.0"
+requires_python = ">=3.8"
+summary = "Python interface to Graphviz's Dot"
+groups = ["default"]
+dependencies = [
+    "pyparsing>=3.0.9",
+]
+files = [
+    {file = "pydot-4.0.0-py3-none-any.whl", hash = "sha256:cf86e13a6cfe2a96758a9702537f77e0ac1368db8ef277b4d3b34473ea425c97"},
+    {file = "pydot-4.0.0.tar.gz", hash = "sha256:12f16493337cade2f7631b87c8ccd299ba2e251f3ee5d0732a058df2887afe97"},
+]
+
+[[package]]
+name = "pydrive2"
+version = "1.21.3"
+requires_python = ">=3.8"
+summary = "Google Drive API made easy. Maintained fork of PyDrive."
+groups = ["default"]
+dependencies = [
+    "PyYAML>=3.0",
+    "cryptography<44",
+    "google-api-python-client>=1.12.5",
+    "oauth2client>=4.0.0",
+    "pyOpenSSL<=24.2.1,>=19.1.0",
+]
+files = [
+    {file = "PyDrive2-1.21.3-py3-none-any.whl", hash = "sha256:843a304f500e71508162807001f5e19487f272e8ff5648f43582bd24c6250200"},
+    {file = "pydrive2-1.21.3.tar.gz", hash = "sha256:649b84d60c637bc7146485039535aa8f1254ad156423739f07e5d32507447c13"},
+]
+
+[[package]]
+name = "pydrive2"
+version = "1.21.3"
+extras = ["fsspec"]
+requires_python = ">=3.8"
+summary = "Google Drive API made easy. Maintained fork of PyDrive."
+groups = ["default"]
+dependencies = [
+    "appdirs>=1.4.3",
+    "fsspec>=2021.07.0",
+    "funcy>=1.14",
+    "pydrive2==1.21.3",
+    "tqdm>=4.0.0",
+]
+files = [
+    {file = "PyDrive2-1.21.3-py3-none-any.whl", hash = "sha256:843a304f500e71508162807001f5e19487f272e8ff5648f43582bd24c6250200"},
+    {file = "pydrive2-1.21.3.tar.gz", hash = "sha256:649b84d60c637bc7146485039535aa8f1254ad156423739f07e5d32507447c13"},
+]
+
+[[package]]
+name = "pygit2"
+version = "1.18.0"
+requires_python = ">=3.10"
+summary = "Python bindings for libgit2."
+groups = ["default"]
+dependencies = [
+    "cffi>=1.17.0",
+]
+files = [
+    {file = "pygit2-1.18.0-cp311-cp311-macosx_10_9_universal2.whl", hash = "sha256:004e52507715d1ed682b52f20b2ea1571cad5502f2ba0b546e257f4c00c94475"},
+    {file = "pygit2-1.18.0-cp311-cp311-manylinux_2_28_aarch64.whl", hash = "sha256:502e75607ca269907ccb20582be8279f22d362f39e25a1dd710e75e934a9a095"},
+    {file = "pygit2-1.18.0-cp311-cp311-manylinux_2_28_ppc64le.whl", hash = "sha256:3bbf11fa63e8eaf161b89bf6e6cc20cf06b337f779a04d79a4999751b9b15adf"},
+    {file = "pygit2-1.18.0-cp311-cp311-manylinux_2_28_x86_64.whl", hash = "sha256:1d97b89ac0a8dddf86727594448bffc78235bcfaee8e5cfd6f410fc1557412b1"},
+    {file = "pygit2-1.18.0-cp311-cp311-musllinux_1_2_x86_64.whl", hash = "sha256:cadfaad3e9856f453b90dd6bc7385d32b9e4393c82e58a3946014c7e95c71913"},
+    {file = "pygit2-1.18.0-cp311-cp311-win32.whl", hash = "sha256:b0e203ec1641140f803e23e5aba61eec9c60cddddaeea4b16f3d29e9def34c9d"},
+    {file = "pygit2-1.18.0-cp311-cp311-win_amd64.whl", hash = "sha256:c3493b128c0a90e120d82666a934c18e0a27e8485493825534832c14d07a8ed7"},
+    {file = "pygit2-1.18.0-pp311-pypy311_pp73-manylinux_2_28_aarch64.whl", hash = "sha256:53c897a8f1093961df44cd91208a2b4c33727a1aaf6b5ca22261e75062f678ff"},
+    {file = "pygit2-1.18.0-pp311-pypy311_pp73-manylinux_2_28_x86_64.whl", hash = "sha256:b07bdd779c892cf4b1212ae9199a64c4416be1a478765f5269c9ba3835540569"},
+    {file = "pygit2-1.18.0.tar.gz", hash = "sha256:fbd01d04a4d2ce289aaa02cf858043679bf0dd1f9855c6b88ed95382c1f5011a"},
+]
+
+[[package]]
 name = "pygments"
 version = "2.19.1"
 requires_python = ">=3.8"
@@ -2270,6 +3822,43 @@ groups = ["default"]
 files = [
     {file = "pygments-2.19.1-py3-none-any.whl", hash = "sha256:9ea1544ad55cecf4b8242fab6dd35a93bbce657034b0611ee383099054ab6d8c"},
     {file = "pygments-2.19.1.tar.gz", hash = "sha256:61c16d2a8576dc0649d9f39e089b5f02bcd27fba10d8fb4dcc28173f7a45151f"},
+]
+
+[[package]]
+name = "pygtrie"
+version = "2.5.0"
+summary = "A pure Python trie data structure implementation."
+groups = ["default"]
+files = [
+    {file = "pygtrie-2.5.0-py3-none-any.whl", hash = "sha256:8795cda8105493d5ae159a5bef313ff13156c5d4d72feddefacaad59f8c8ce16"},
+    {file = "pygtrie-2.5.0.tar.gz", hash = "sha256:203514ad826eb403dab1d2e2ddd034e0d1534bbe4dbe0213bb0593f66beba4e2"},
+]
+
+[[package]]
+name = "pyjwt"
+version = "2.10.1"
+requires_python = ">=3.9"
+summary = "JSON Web Token implementation in Python"
+groups = ["default"]
+files = [
+    {file = "PyJWT-2.10.1-py3-none-any.whl", hash = "sha256:dcdd193e30abefd5debf142f9adfcdd2b58004e644f25406ffaebd50bd98dacb"},
+    {file = "pyjwt-2.10.1.tar.gz", hash = "sha256:3cc5772eb20009233caf06e9d8a0577824723b44e6648ee0a2aedb6cf9381953"},
+]
+
+[[package]]
+name = "pyjwt"
+version = "2.10.1"
+extras = ["crypto"]
+requires_python = ">=3.9"
+summary = "JSON Web Token implementation in Python"
+groups = ["default"]
+dependencies = [
+    "PyJWT==2.10.1",
+    "cryptography>=3.4.0",
+]
+files = [
+    {file = "PyJWT-2.10.1-py3-none-any.whl", hash = "sha256:dcdd193e30abefd5debf142f9adfcdd2b58004e644f25406ffaebd50bd98dacb"},
+    {file = "pyjwt-2.10.1.tar.gz", hash = "sha256:3cc5772eb20009233caf06e9d8a0577824723b44e6648ee0a2aedb6cf9381953"},
 ]
 
 [[package]]
@@ -2288,6 +3877,20 @@ dependencies = [
 files = [
     {file = "pynndescent-0.5.13-py3-none-any.whl", hash = "sha256:69aabb8f394bc631b6ac475a1c7f3994c54adf3f51cd63b2730fefba5771b949"},
     {file = "pynndescent-0.5.13.tar.gz", hash = "sha256:d74254c0ee0a1eeec84597d5fe89fedcf778593eeabe32c2f97412934a9800fb"},
+]
+
+[[package]]
+name = "pyopenssl"
+version = "24.2.1"
+requires_python = ">=3.7"
+summary = "Python wrapper module around the OpenSSL library"
+groups = ["default"]
+dependencies = [
+    "cryptography<44,>=41.0.5",
+]
+files = [
+    {file = "pyOpenSSL-24.2.1-py3-none-any.whl", hash = "sha256:967d5719b12b243588573f39b0c677637145c7a1ffedcd495a487e58177fbb8d"},
+    {file = "pyopenssl-24.2.1.tar.gz", hash = "sha256:4247f0dbe3748d560dcbb2ff3ea01af0f9a1a001ef5f7c4c647956ed8cbf0e95"},
 ]
 
 [[package]]
@@ -2422,7 +4025,7 @@ name = "pywin32"
 version = "310"
 summary = "Python for Window Extensions"
 groups = ["default"]
-marker = "sys_platform == \"win32\" and platform_python_implementation != \"PyPy\" or platform_system == \"Windows\""
+marker = "sys_platform == \"win32\" or platform_system == \"Windows\""
 files = [
     {file = "pywin32-310-cp311-cp311-win32.whl", hash = "sha256:1e765f9564e83011a63321bb9d27ec456a0ed90d3732c4b2e312b855365ed8bd"},
     {file = "pywin32-310-cp311-cp311-win_amd64.whl", hash = "sha256:126298077a9d7c95c53823934f000599f66ec9296b09167810eb24875f32689c"},
@@ -2569,6 +4172,21 @@ files = [
 ]
 
 [[package]]
+name = "requests-oauthlib"
+version = "2.0.0"
+requires_python = ">=3.4"
+summary = "OAuthlib authentication support for Requests."
+groups = ["default"]
+dependencies = [
+    "oauthlib>=3.0.0",
+    "requests>=2.0.0",
+]
+files = [
+    {file = "requests-oauthlib-2.0.0.tar.gz", hash = "sha256:b3dffaebd884d8cd778494369603a9e7b58d29111bf6b41bdc2dcd87203af4e9"},
+    {file = "requests_oauthlib-2.0.0-py2.py3-none-any.whl", hash = "sha256:7dd8a5c40426b779b0868c404bdef9768deccf22749cde15852df527e6269b36"},
+]
+
+[[package]]
 name = "requests-toolbelt"
 version = "1.0.0"
 requires_python = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
@@ -2681,6 +4299,36 @@ files = [
 ]
 
 [[package]]
+name = "s3fs"
+version = "2025.3.2"
+requires_python = ">=3.9"
+summary = "Convenient Filesystem interface over S3"
+groups = ["default"]
+dependencies = [
+    "aiobotocore<3.0.0,>=2.5.4",
+    "aiohttp!=4.0.0a0,!=4.0.0a1",
+    "fsspec==2025.3.2.*",
+]
+files = [
+    {file = "s3fs-2025.3.2-py3-none-any.whl", hash = "sha256:81eae3f37b4b04bcc08845d7bcc607c6ca45878813ef7e6a28d77b2688417130"},
+    {file = "s3fs-2025.3.2.tar.gz", hash = "sha256:6798f896ec76dd3bfd8beb89f0bb7c5263cb2760e038bae0978505cd172a307c"},
+]
+
+[[package]]
+name = "s3transfer"
+version = "0.11.3"
+requires_python = ">=3.8"
+summary = "An Amazon S3 Transfer Manager"
+groups = ["default"]
+dependencies = [
+    "botocore<2.0a.0,>=1.36.0",
+]
+files = [
+    {file = "s3transfer-0.11.3-py3-none-any.whl", hash = "sha256:ca855bdeb885174b5ffa95b9913622459d4ad8e331fc98eb01e6d5eb6a30655d"},
+    {file = "s3transfer-0.11.3.tar.gz", hash = "sha256:edae4977e3a122445660c7c114bba949f9d191bae3b34a096f18a1c8c354527a"},
+]
+
+[[package]]
 name = "safetensors"
 version = "0.5.3"
 requires_python = ">=3.7"
@@ -2748,6 +4396,29 @@ files = [
 ]
 
 [[package]]
+name = "scmrepo"
+version = "3.3.11"
+requires_python = ">=3.9"
+summary = "scmrepo"
+groups = ["default"]
+dependencies = [
+    "aiohttp-retry>=2.5.0",
+    "asyncssh<3,>=2.13.1",
+    "dulwich>=0.22.1",
+    "fsspec[tqdm]>=2024.2.0",
+    "funcy>=1.14",
+    "gitpython>3",
+    "pathspec>=0.9.0",
+    "pygit2>=1.14.0",
+    "pygtrie>=2.3.2",
+    "tqdm",
+]
+files = [
+    {file = "scmrepo-3.3.11-py3-none-any.whl", hash = "sha256:58b7948b218abecd3637d91ff937c442315052d3340bf7abc0a867ef2fb14e0c"},
+    {file = "scmrepo-3.3.11.tar.gz", hash = "sha256:eb25424a7cc1290e3e0aeaa8a39bb8347b9abc5fab33356e8a70db530d7d06b6"},
+]
+
+[[package]]
 name = "seaborn"
 version = "0.13.2"
 requires_python = ">=3.8"
@@ -2761,6 +4432,17 @@ dependencies = [
 files = [
     {file = "seaborn-0.13.2-py3-none-any.whl", hash = "sha256:636f8336facf092165e27924f223d3c62ca560b1f2bb5dff7ab7fad265361987"},
     {file = "seaborn-0.13.2.tar.gz", hash = "sha256:93e60a40988f4d65e9f4885df477e2fdaff6b73a9ded434c1ab356dd57eefff7"},
+]
+
+[[package]]
+name = "semver"
+version = "3.0.4"
+requires_python = ">=3.7"
+summary = "Python helper for Semantic Versioning (https://semver.org)"
+groups = ["default"]
+files = [
+    {file = "semver-3.0.4-py3-none-any.whl", hash = "sha256:9c824d87ba7f7ab4a1890799cec8596f15c1241cb473404ea1cb0c55e4b04746"},
+    {file = "semver-3.0.4.tar.gz", hash = "sha256:afc7d8c584a5ed0a11033af086e8af226a9c0b206f313e0301f8dd7b6b589602"},
 ]
 
 [[package]]
@@ -2810,6 +4492,39 @@ groups = ["default"]
 files = [
     {file = "setuptools-80.4.0-py3-none-any.whl", hash = "sha256:6cdc8cb9a7d590b237dbe4493614a9b75d0559b888047c1f67d49ba50fc3edb2"},
     {file = "setuptools-80.4.0.tar.gz", hash = "sha256:5a78f61820bc088c8e4add52932ae6b8cf423da2aff268c23f813cfbb13b4006"},
+]
+
+[[package]]
+name = "shellingham"
+version = "1.5.4"
+requires_python = ">=3.7"
+summary = "Tool to Detect Surrounding Shell"
+groups = ["default"]
+files = [
+    {file = "shellingham-1.5.4-py2.py3-none-any.whl", hash = "sha256:7ecfff8f2fd72616f7481040475a65b2bf8af90a56c89140852d1120324e8686"},
+    {file = "shellingham-1.5.4.tar.gz", hash = "sha256:8dbca0739d487e5bd35ab3ca4b36e11c4078f3a234bfce294b0a0291363404de"},
+]
+
+[[package]]
+name = "shortuuid"
+version = "1.0.13"
+requires_python = ">=3.6"
+summary = "A generator library for concise, unambiguous and URL-safe UUIDs."
+groups = ["default"]
+files = [
+    {file = "shortuuid-1.0.13-py3-none-any.whl", hash = "sha256:a482a497300b49b4953e15108a7913244e1bb0d41f9d332f5e9925dba33a3c5a"},
+    {file = "shortuuid-1.0.13.tar.gz", hash = "sha256:3bb9cf07f606260584b1df46399c0b87dd84773e7b25912b7e391e30797c5e72"},
+]
+
+[[package]]
+name = "shtab"
+version = "1.7.2"
+requires_python = ">=3.7"
+summary = "Automagic shell tab completion for Python CLI applications"
+groups = ["default"]
+files = [
+    {file = "shtab-1.7.2-py3-none-any.whl", hash = "sha256:858a5805f6c137bb0cda4f282d27d08fd44ca487ab4a6a36d2a400263cd0b5c1"},
+    {file = "shtab-1.7.2.tar.gz", hash = "sha256:8c16673ade76a2d42417f03e57acf239bfb5968e842204c17990cae357d07d6f"},
 ]
 
 [[package]]
@@ -2878,6 +4593,51 @@ files = [
     {file = "sqlalchemy-2.0.40-cp311-cp311-win_amd64.whl", hash = "sha256:574aea2c54d8f1dd1699449f332c7d9b71c339e04ae50163a3eb5ce4c4325ee4"},
     {file = "sqlalchemy-2.0.40-py3-none-any.whl", hash = "sha256:32587e2e1e359276957e6fe5dad089758bc042a971a8a09ae8ecf7a8fe23d07a"},
     {file = "sqlalchemy-2.0.40.tar.gz", hash = "sha256:d827099289c64589418ebbcaead0145cd19f4e3e8a93919a0100247af245fa00"},
+]
+
+[[package]]
+name = "sqltrie"
+version = "0.11.2"
+requires_python = ">=3.8"
+summary = "SQL-based prefix tree inspired by pygtrie and python-diskcache"
+groups = ["default"]
+dependencies = [
+    "attrs>=22.2.0",
+    "orjson; implementation_name == \"cpython\"",
+    "pygtrie",
+]
+files = [
+    {file = "sqltrie-0.11.2-py3-none-any.whl", hash = "sha256:4afb1390bbe8a6900a53709b76213a436fbaf352de0b99ba9b0d395d4a0ca6b6"},
+    {file = "sqltrie-0.11.2.tar.gz", hash = "sha256:4df47089b3abfe347bcf81044e633b8c7737ebda4ce1fec8b636a85954ac36da"},
+]
+
+[[package]]
+name = "sshfs"
+version = "2025.2.0"
+summary = "SSH Filesystem -- Async SSH/SFTP backend for fsspec"
+groups = ["default"]
+dependencies = [
+    "asyncssh<3,>=2.11.0",
+    "fsspec>=2021.8.1",
+]
+files = [
+    {file = "sshfs-2025.2.0-py3-none-any.whl", hash = "sha256:c5213e11da42f6c31f3fb6332726cc5a894cde44cc47cd1519c9da705dafccdc"},
+    {file = "sshfs-2025.2.0.tar.gz", hash = "sha256:1a60b872062078cfb9d954d9c728f3e72e5bc81aa913dc0f91e687305a005fe1"},
+]
+
+[[package]]
+name = "sshfs"
+version = "2025.2.0"
+extras = ["bcrypt"]
+summary = "SSH Filesystem -- Async SSH/SFTP backend for fsspec"
+groups = ["default"]
+dependencies = [
+    "asyncssh[bcrypt]",
+    "sshfs==2025.2.0",
+]
+files = [
+    {file = "sshfs-2025.2.0-py3-none-any.whl", hash = "sha256:c5213e11da42f6c31f3fb6332726cc5a894cde44cc47cd1519c9da705dafccdc"},
+    {file = "sshfs-2025.2.0.tar.gz", hash = "sha256:1a60b872062078cfb9d954d9c728f3e72e5bc81aa913dc0f91e687305a005fe1"},
 ]
 
 [[package]]
@@ -3298,6 +5058,23 @@ files = [
 ]
 
 [[package]]
+name = "typer"
+version = "0.15.4"
+requires_python = ">=3.7"
+summary = "Typer, build great CLIs. Easy to code. Based on Python type hints."
+groups = ["default"]
+dependencies = [
+    "click<8.2,>=8.0.0",
+    "rich>=10.11.0",
+    "shellingham>=1.3.0",
+    "typing-extensions>=3.7.4.3",
+]
+files = [
+    {file = "typer-0.15.4-py3-none-any.whl", hash = "sha256:eb0651654dcdea706780c466cf06d8f174405a659ffff8f163cfbfee98c0e173"},
+    {file = "typer-0.15.4.tar.gz", hash = "sha256:89507b104f9b6a0730354f27c39fae5b63ccd0c95b1ce1f1a6ba0cfd329997c3"},
+]
+
+[[package]]
 name = "typing-extensions"
 version = "4.13.2"
 requires_python = ">=3.8"
@@ -3367,6 +5144,17 @@ files = [
 ]
 
 [[package]]
+name = "uritemplate"
+version = "4.1.1"
+requires_python = ">=3.6"
+summary = "Implementation of RFC 6570 URI Templates"
+groups = ["default"]
+files = [
+    {file = "uritemplate-4.1.1-py2.py3-none-any.whl", hash = "sha256:830c08b8d99bdd312ea4ead05994a38e8936266f84b9a7878232db50b044e02e"},
+    {file = "uritemplate-4.1.1.tar.gz", hash = "sha256:4346edfc5c3b79f694bccd6d6099a322bbeb628dbf2cd86eea55a456ce5124f0"},
+]
+
+[[package]]
 name = "urllib3"
 version = "2.4.0"
 requires_python = ">=3.9"
@@ -3433,6 +5221,17 @@ files = [
 ]
 
 [[package]]
+name = "vine"
+version = "5.1.0"
+requires_python = ">=3.6"
+summary = "Python promises."
+groups = ["default"]
+files = [
+    {file = "vine-5.1.0-py3-none-any.whl", hash = "sha256:40fdf3c48b2cfe1c38a49e9ae2da6fda88e4794c810050a728bd7413811fb1dc"},
+    {file = "vine-5.1.0.tar.gz", hash = "sha256:8b62e981d35c41049211cf62a0a1242d8c1ee9bd15bb196ce38aefd6799e61e0"},
+]
+
+[[package]]
 name = "virtualenv"
 version = "20.31.2"
 requires_python = ">=3.8"
@@ -3484,6 +5283,17 @@ dependencies = [
 files = [
     {file = "visions-0.8.1-py3-none-any.whl", hash = "sha256:aca16b66c93acf6c39d3b6b952429947605203e02c0678a42ea06257fcbb1211"},
     {file = "visions-0.8.1.tar.gz", hash = "sha256:37f55c37d7bcf124054e612850b28a4f0bab9b200733cedd8f1781c3ac5cc3f0"},
+]
+
+[[package]]
+name = "voluptuous"
+version = "0.15.2"
+requires_python = ">=3.9"
+summary = "Python data validation library"
+groups = ["default"]
+files = [
+    {file = "voluptuous-0.15.2-py3-none-any.whl", hash = "sha256:016348bc7788a9af9520b1764ebd4de0df41fe2138ebe9e06fa036bf86a65566"},
+    {file = "voluptuous-0.15.2.tar.gz", hash = "sha256:6ffcab32c4d3230b4d2af3a577c87e1908a714a11f6f95570456b1849b0279aa"},
 ]
 
 [[package]]
@@ -3549,6 +5359,21 @@ files = [
 ]
 
 [[package]]
+name = "webdav4"
+version = "0.10.0"
+requires_python = ">=3.8"
+summary = "WebDAV client library with an fsspec-based filesystem and a CLI"
+groups = ["default"]
+dependencies = [
+    "httpx<1,>=0.20",
+    "python-dateutil>=2.8.1",
+]
+files = [
+    {file = "webdav4-0.10.0-py3-none-any.whl", hash = "sha256:8f915d72483e572089a3af0a2ad20c7e12d04eee9b9134eb718dbfa37af221d8"},
+    {file = "webdav4-0.10.0.tar.gz", hash = "sha256:387da6f0ee384e77149dddd9bcfd434afa155882f6c440a529a7cb458624407f"},
+]
+
+[[package]]
 name = "websockets"
 version = "15.0.1"
 requires_python = ">=3.9"
@@ -3602,6 +5427,28 @@ files = [
     {file = "wordcloud-1.9.4-cp311-cp311-win32.whl", hash = "sha256:0ac3d87627022fb8cce17297298be96c91185edd55ecf8906f89f981b55974f0"},
     {file = "wordcloud-1.9.4-cp311-cp311-win_amd64.whl", hash = "sha256:85368249df056527f1b64e80e68636abb61f0f6bd2d1c430894d2af1feea7f73"},
     {file = "wordcloud-1.9.4.tar.gz", hash = "sha256:b273d8a5ded97d3ead904046b49464dcb71119ee79df875072a4c105cadd347a"},
+]
+
+[[package]]
+name = "wrapt"
+version = "1.17.2"
+requires_python = ">=3.8"
+summary = "Module for decorators, wrappers and monkey patching."
+groups = ["default"]
+files = [
+    {file = "wrapt-1.17.2-cp311-cp311-macosx_10_9_universal2.whl", hash = "sha256:ff04ef6eec3eee8a5efef2401495967a916feaa353643defcc03fc74fe213b58"},
+    {file = "wrapt-1.17.2-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:4db983e7bca53819efdbd64590ee96c9213894272c776966ca6306b73e4affda"},
+    {file = "wrapt-1.17.2-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:9abc77a4ce4c6f2a3168ff34b1da9b0f311a8f1cfd694ec96b0603dff1c79438"},
+    {file = "wrapt-1.17.2-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:0b929ac182f5ace000d459c59c2c9c33047e20e935f8e39371fa6e3b85d56f4a"},
+    {file = "wrapt-1.17.2-cp311-cp311-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:f09b286faeff3c750a879d336fb6d8713206fc97af3adc14def0cdd349df6000"},
+    {file = "wrapt-1.17.2-cp311-cp311-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:1a7ed2d9d039bd41e889f6fb9364554052ca21ce823580f6a07c4ec245c1f5d6"},
+    {file = "wrapt-1.17.2-cp311-cp311-musllinux_1_2_aarch64.whl", hash = "sha256:129a150f5c445165ff941fc02ee27df65940fcb8a22a61828b1853c98763a64b"},
+    {file = "wrapt-1.17.2-cp311-cp311-musllinux_1_2_i686.whl", hash = "sha256:1fb5699e4464afe5c7e65fa51d4f99e0b2eadcc176e4aa33600a3df7801d6662"},
+    {file = "wrapt-1.17.2-cp311-cp311-musllinux_1_2_x86_64.whl", hash = "sha256:9a2bce789a5ea90e51a02dfcc39e31b7f1e662bc3317979aa7e5538e3a034f72"},
+    {file = "wrapt-1.17.2-cp311-cp311-win32.whl", hash = "sha256:4afd5814270fdf6380616b321fd31435a462019d834f83c8611a0ce7484c7317"},
+    {file = "wrapt-1.17.2-cp311-cp311-win_amd64.whl", hash = "sha256:acc130bc0375999da18e3d19e5a86403667ac0c4042a094fefb7eec8ebac7cf3"},
+    {file = "wrapt-1.17.2-py3-none-any.whl", hash = "sha256:b18f2d1533a71f069c7f82d524a52599053d4c7166e9dd374ae2136b7f40f7c8"},
+    {file = "wrapt-1.17.2.tar.gz", hash = "sha256:41388e9d4d1522446fe79d3213196bd9e3b301a336965b9e27ca2788ebd122f3"},
 ]
 
 [[package]]
@@ -3668,4 +5515,18 @@ dependencies = [
 files = [
     {file = "ydata-profiling-4.16.1.tar.gz", hash = "sha256:4aa0d6412a140194396e34f5ffd348223f0319d877b0243e765f30ae633ed51e"},
     {file = "ydata_profiling-4.16.1-py2.py3-none-any.whl", hash = "sha256:c4655c47f826490c77ea7ca5e9cb613e274db8686ebc095fa01f9735c6466f1f"},
+]
+
+[[package]]
+name = "zc-lockfile"
+version = "3.0.post1"
+requires_python = ">=3.7"
+summary = "Basic inter-process locks"
+groups = ["default"]
+dependencies = [
+    "setuptools",
+]
+files = [
+    {file = "zc.lockfile-3.0.post1-py3-none-any.whl", hash = "sha256:ddb2d71088c061dc8a5edbaa346b637d742ca1e1564be75cb98e7dcae715de19"},
+    {file = "zc.lockfile-3.0.post1.tar.gz", hash = "sha256:adb2ee6d9e6a2333c91178dcb2c9b96a5744c78edb7712dc784a7d75648e81ec"},
 ]
