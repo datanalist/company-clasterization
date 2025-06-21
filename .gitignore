@@ -1,7 +1,4 @@
-/data/raw/*
-/data/processed/*
-/data/interim/*
-/data/external/*
+data/
 
  Byte-compiled / optimized / DLL files
 __pycache__/
@@ -144,7 +141,7 @@ venv.bak/
 /data/
 
 # Spyder project settings
-.spyderproject  
+.spyderproject
 .spyproject
 
 # Rope project settings
