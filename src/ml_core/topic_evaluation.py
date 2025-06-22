@@ -16,15 +16,9 @@ import logging
 # Импорты для CV Coherence
 from gensim.corpora import Dictionary
 from gensim.models.coherencemodel import CoherenceModel
-from nltk.tokenize import word_tokenize
-import nltk
-import re
 
-# Загружаем необходимые данные для токенизации
-try:
-    nltk.data.find("tokenizers/punkt")
-except LookupError:
-    nltk.download("punkt")
+from .utils import clean_text, tokenize_ru
+
 
 logger = logging.getLogger(__name__)
 
@@ -296,11 +290,11 @@ class TopicModelEvaluator:
         try:
             for text in self.texts:
                 # Очистка текста
-                clean_text = re.sub(r"[^\w\s]", " ", text.lower())
-                clean_text = re.sub(r"\s+", " ", clean_text).strip()
+                # --- ЗАМЕНИТЬ НА ПРЕДВАРИТЕЛЬНУЮ ОБРАБОТКУ ИЗ TOPICS.IPYNB ---
+                cleaned_text = clean_text(text)
 
                 # Токенизация
-                tokens = word_tokenize(clean_text, language="russian")
+                tokens = tokenize_ru(cleaned_text)
 
                 # Фильтрация токенов (минимальная длина, исключение цифр)
                 filtered_tokens = [
@@ -309,7 +303,7 @@ class TopicModelEvaluator:
 
                 if filtered_tokens:
                     processed_texts.append(filtered_tokens)
-
+                # ^^^ ЗАМЕНИТЬ НА ПРЕДВАРИТЕЛЬНУЮ ОБРАБОТКУ ИЗ TOPICS.IPYNB ^^^
             logger.info(
                 f"Обработано {len(processed_texts)} текстов для вычисления когерентности"
             )
