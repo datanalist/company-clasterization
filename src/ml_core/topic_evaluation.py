@@ -82,13 +82,34 @@ class TopicModelEvaluator:
         metrics["n_topics"] = n_topics
 
         # Процент выбросов
-        outlier_ratio = sum(1 for t in self.topics if t == -1) / len(self.topics)
+        if len(self.topics) == 0:
+            outlier_ratio = 0.0
+        else:
+            outlier_ratio = sum(1 for t in self.topics if t == -1) / len(self.topics)
         metrics["outlier_ratio"] = outlier_ratio
 
         # Средний размер темы
-        topic_sizes = [self.topics.count(t) for t in unique_topics if t != -1]
-        metrics["avg_topic_size"] = np.mean(topic_sizes) if topic_sizes else 0
-        metrics["std_topic_size"] = np.std(topic_sizes) if topic_sizes else 0
+        if len(self.topics) == 0:
+            metrics["avg_topic_size"] = 0
+            metrics["std_topic_size"] = 0
+            metrics["min_topic_size"] = 0
+            metrics["max_topic_size"] = 0
+        else:
+            # Используем pandas для эффективного подсчета
+            topic_counts = pd.Series(self.topics).value_counts()
+            if -1 in topic_counts.index:
+                topic_counts = topic_counts.drop(-1)  # Исключаем выбросы
+
+            if len(topic_counts) > 0:
+                metrics["avg_topic_size"] = float(topic_counts.mean())
+                metrics["std_topic_size"] = float(topic_counts.std())
+                metrics["min_topic_size"] = int(topic_counts.min())
+                metrics["max_topic_size"] = int(topic_counts.max())
+            else:
+                metrics["avg_topic_size"] = 0
+                metrics["std_topic_size"] = 0
+                metrics["min_topic_size"] = 0
+                metrics["max_topic_size"] = 0
 
         logger.info(f"Базовые метрики: {n_topics} тем, {outlier_ratio:.2%} выбросов")
         return metrics
@@ -107,16 +128,24 @@ class TopicModelEvaluator:
         filtered_topics = np.array(self.topics)[non_outlier_mask]
 
         try:
-            # Silhouette Score
-            if len(set(filtered_topics)) > 1:
-                sil_score = silhouette_score(filtered_embeddings, filtered_topics)
-                metrics["silhouette_score"] = sil_score
+            # Проверяем количество уникальных кластеров
+            unique_clusters = len(set(filtered_topics))
 
-            # Calinski-Harabasz Index
+            if unique_clusters < 2:
+                logger.warning(
+                    "Недостаточно кластеров для вычисления метрик кластеризации (нужно минимум 2)"
+                )
+                return metrics
+
+            # Силуэтная оценка
+            sil_score = silhouette_score(filtered_embeddings, filtered_topics)
+            metrics["silhouette_score"] = sil_score
+
+            # Индекс Калинского-Харабаша
             ch_score = calinski_harabasz_score(filtered_embeddings, filtered_topics)
             metrics["calinski_harabasz_score"] = ch_score
 
-            # Davies-Bouldin Index
+            # Индекс Дэвиса-Болдина
             db_score = davies_bouldin_score(filtered_embeddings, filtered_topics)
             metrics["davies_bouldin_score"] = db_score
 
@@ -184,8 +213,22 @@ class TopicModelEvaluator:
 
             if len(topic_counts) > 0:
                 probabilities = topic_counts / topic_counts.sum()
-                entropy = -np.sum(probabilities * np.log2(probabilities + 1e-10))
-                metrics["topic_entropy"] = entropy
+
+                # Убираем нулевые вероятности для избежания log(0)
+                probabilities = probabilities[probabilities > 0]
+
+                if len(probabilities) > 1:
+                    entropy = -np.sum(probabilities * np.log2(probabilities))
+                    metrics["topic_entropy"] = entropy
+
+                    # Нормализованная энтропия (0-1)
+                    max_entropy = np.log2(len(probabilities))
+                    metrics["normalized_topic_entropy"] = (
+                        entropy / max_entropy if max_entropy > 0 else 0
+                    )
+                else:
+                    metrics["topic_entropy"] = 0.0
+                    metrics["normalized_topic_entropy"] = 0.0
 
                 # Коэффициент Джини для неравномерности распределения
                 gini = self._calculate_gini_coefficient(topic_counts.values)
@@ -200,10 +243,25 @@ class TopicModelEvaluator:
 
     def _calculate_gini_coefficient(self, values: np.ndarray) -> float:
         """Вычисление коэффициента Джини для массива значений."""
+        if len(values) == 0:
+            return 0.0
+
+        if len(values) == 1:
+            return 0.0
+
+        # Сортируем по возрастанию
         sorted_values = np.sort(values)
         n = len(values)
-        cumsum = np.cumsum(sorted_values)
-        return (n + 1 - 2 * np.sum(cumsum) / cumsum[-1]) / n
+
+        # Правильная формула коэффициента Джини
+        # G = (2 * sum(i * y_i)) / (n * sum(y_i)) - (n + 1) / n
+        # где i - ранг (1, 2, ..., n), y_i - отсортированные значения
+        indices = np.arange(1, n + 1)  # ранги от 1 до n
+        gini = (2 * np.sum(indices * sorted_values)) / (n * np.sum(sorted_values)) - (
+            n + 1
+        ) / n
+
+        return max(0.0, min(1.0, gini))  # Ограничиваем в диапазоне [0, 1]
 
     def calculate_cv_coherence(self, n_words: int = 10) -> dict[str, float]:
         """
@@ -240,36 +298,49 @@ class TopicModelEvaluator:
             # Вычисляем CV Coherence для каждой темы
             topic_info = self.topic_model.get_topic_info()
 
-            for i, topic_id in enumerate(topic_info["Topic"]):
-                if topic_id != -1 and i < len(topic_words):
-                    try:
-                        # Создаем модель когерентности для одной темы
-                        coherence_model = CoherenceModel(
-                            topics=[topic_words[i]],
-                            texts=processed_texts,
-                            dictionary=dictionary,
-                            coherence="c_v",
-                        )
+            # Создаем словарь для правильного соответствия topic_id -> topic_words
+            topic_id_to_words = {}
+            topic_words_idx = 0
 
-                        coherence_score = coherence_model.get_coherence()
-                        coherence_scores[f"topic_{topic_id}_cv_coherence"] = (
-                            coherence_score
-                        )
+            for topic_id in topic_info["Topic"]:
+                if topic_id != -1:
+                    if topic_words_idx < len(topic_words):
+                        topic_id_to_words[topic_id] = topic_words[topic_words_idx]
+                        topic_words_idx += 1
 
-                    except Exception as e:
-                        logger.warning(
-                            f"Ошибка при вычислении когерентности для темы {topic_id}: {e}"
-                        )
-                        coherence_scores[f"topic_{topic_id}_cv_coherence"] = 0.0
+            for topic_id, words in topic_id_to_words.items():
+                try:
+                    # Создаем модель когерентности для одной темы
+                    coherence_model = CoherenceModel(
+                        topics=[words],
+                        texts=processed_texts,
+                        dictionary=dictionary,
+                        coherence="c_v",
+                    )
+
+                    coherence_score = coherence_model.get_coherence()
+                    coherence_scores[f"topic_{topic_id}_cv_coherence"] = coherence_score
+
+                except Exception as e:
+                    logger.warning(
+                        f"Ошибка при вычислении когерентности для темы {topic_id}: {e}"
+                    )
+                    coherence_scores[f"topic_{topic_id}_cv_coherence"] = 0.0
 
             # Средняя CV Coherence по всем темам
             individual_scores = [
                 score
                 for key, score in coherence_scores.items()
                 if key.endswith("_cv_coherence")
+                and score > 0  # Исключаем ошибки и нулевые значения
             ]
             if individual_scores:
                 coherence_scores["avg_cv_coherence"] = np.mean(individual_scores)
+                coherence_scores["std_cv_coherence"] = np.std(individual_scores)
+                coherence_scores["min_cv_coherence"] = np.min(individual_scores)
+                coherence_scores["max_cv_coherence"] = np.max(individual_scores)
+            else:
+                coherence_scores["avg_cv_coherence"] = 0.0
 
             logger.info(f"CV Coherence вычислена для {len(individual_scores)} тем")
 
@@ -288,28 +359,47 @@ class TopicModelEvaluator:
         processed_texts = []
 
         try:
-            for text in self.texts:
-                # Очистка текста
-                # --- ЗАМЕНИТЬ НА ПРЕДВАРИТЕЛЬНУЮ ОБРАБОТКУ ИЗ TOPICS.IPYNB ---
-                cleaned_text = clean_text(text)
+            if not self.texts:
+                logger.warning("Пустой список текстов для предобработки")
+                return processed_texts
 
-                # Токенизация
-                tokens = tokenize_ru(cleaned_text)
+            for i, text in enumerate(self.texts):
+                try:
+                    if not isinstance(text, str):
+                        logger.warning(f"Текст {i} не является строкой, пропускаем")
+                        continue
 
-                # Фильтрация токенов (минимальная длина, исключение цифр)
-                filtered_tokens = [
-                    token for token in tokens if len(token) > 2 and token.isalpha()
-                ]
+                    if not text.strip():
+                        logger.warning(f"Пустой текст {i}, пропускаем")
+                        continue
 
-                if filtered_tokens:
-                    processed_texts.append(filtered_tokens)
-                # ^^^ ЗАМЕНИТЬ НА ПРЕДВАРИТЕЛЬНУЮ ОБРАБОТКУ ИЗ TOPICS.IPYNB ^^^
+                    # Очистка текста
+                    # --- ЗАМЕНИТЬ НА ПРЕДВАРИТЕЛЬНУЮ ОБРАБОТКУ ИЗ TOPICS.IPYNB ---
+                    cleaned_text = clean_text(text)
+
+                    # Токенизация
+                    tokens = tokenize_ru(cleaned_text)
+
+                    # Фильтрация токенов (минимальная длина, исключение цифр)
+                    filtered_tokens = [
+                        token
+                        for token in tokens
+                        if isinstance(token, str) and len(token) > 2 and token.isalpha()
+                    ]
+
+                    if filtered_tokens:
+                        processed_texts.append(filtered_tokens)
+                    # ^^^ ЗАМЕНИТЬ НА ПРЕДВАРИТЕЛЬНУЮ ОБРАБОТКУ ИЗ TOPICS.IPYNB ^^^
+                except Exception as e:
+                    logger.warning(f"Ошибка при обработке текста {i}: {e}")
+                    continue
+
             logger.info(
-                f"Обработано {len(processed_texts)} текстов для вычисления когерентности"
+                f"Обработано {len(processed_texts)} текстов из {len(self.texts)} для вычисления когерентности"
             )
 
         except Exception as e:
-            logger.error(f"Ошибка при предобработке текстов: {e}")
+            logger.error(f"Критическая ошибка при предобработке текстов: {e}")
 
         return processed_texts
 
@@ -326,21 +416,49 @@ class TopicModelEvaluator:
         topic_words = []
 
         try:
+            if n_words <= 0:
+                logger.warning("Количество слов должно быть положительным")
+                return topic_words
+
             topic_info = self.topic_model.get_topic_info()
+
+            if topic_info is None or topic_info.empty:
+                logger.warning("Пустая информация о темах")
+                return topic_words
 
             for topic_id in topic_info["Topic"]:
                 if topic_id != -1:
-                    # Получаем топовые слова темы
-                    words = [
-                        word
-                        for word, _ in self.topic_model.get_topic(topic_id)[:n_words]
-                    ]
-                    topic_words.append(words)
+                    try:
+                        # Получаем топовые слова темы
+                        topic_data = self.topic_model.get_topic(topic_id)
+
+                        if not topic_data:
+                            logger.warning(f"Пустые данные для темы {topic_id}")
+                            continue
+
+                        words = [
+                            word
+                            for word, score in topic_data[:n_words]
+                            if isinstance(word, str) and word.strip()
+                        ]
+
+                        if words:  # Добавляем только непустые списки слов
+                            topic_words.append(words)
+                        else:
+                            logger.warning(
+                                f"Не найдено валидных слов для темы {topic_id}"
+                            )
+
+                    except Exception as e:
+                        logger.warning(
+                            f"Ошибка при извлечении слов темы {topic_id}: {e}"
+                        )
+                        continue
 
             logger.info(f"Извлечено слов для {len(topic_words)} тем")
 
         except Exception as e:
-            logger.error(f"Ошибка при извлечении слов тем: {e}")
+            logger.error(f"Критическая ошибка при извлечении слов тем: {e}")
 
         return topic_words
 
@@ -382,13 +500,23 @@ class TopicModelEvaluator:
         interpretations = {
             "n_topics": "Количество обнаруженных тем",
             "outlier_ratio": "Доля документов-выбросов (чем меньше, тем лучше)",
+            "avg_topic_size": "Средний размер темы (количество документов)",
+            "std_topic_size": "Стандартное отклонение размеров тем",
+            "min_topic_size": "Минимальный размер темы",
+            "max_topic_size": "Максимальный размер темы",
             "silhouette_score": "Качество кластеризации (-1 до 1, выше лучше)",
             "calinski_harabasz_score": "Отношение межгрупповой/внутригрупповой дисперсии (выше лучше)",
             "davies_bouldin_score": "Средняя схожесть кластеров (ниже лучше)",
             "topic_entropy": "Энтропия распределения тем (выше = более равномерно)",
+            "normalized_topic_entropy": "Нормализованная энтропия (0-1, выше = равномернее)",
             "topic_gini_coefficient": "Неравномерность распределения (0-1, ниже лучше)",
             "avg_cv_coherence": "Средняя CV Coherence тем (выше лучше)",
+            "std_cv_coherence": "Стандартное отклонение CV Coherence",
+            "min_cv_coherence": "Минимальная CV Coherence среди тем",
+            "max_cv_coherence": "Максимальная CV Coherence среди тем",
             "topic_word_uniqueness": "Уникальность слов в темах (выше лучше)",
+            "avg_topic_representation_length": "Средняя длина представления темы",
+            "std_topic_representation_length": "Стандартное отклонение длины представлений",
         }
 
         return interpretations.get(metric_name, "Специфическая метрика")
