@@ -1,4 +1,8 @@
 from typing import Literal
+import logging
+
+# Настройка логирования
+logger = logging.getLogger(__name__)
 
 
 class EmbeddingModel:
@@ -53,48 +57,75 @@ class EmbeddingModel:
 
             try:
                 return SentenceTransformer(**kwargs)
-            except Exception:
+            except Exception as e:
+                logger.error(f"Ошибка при создании модели SentenceTransformer: {e}")
                 raise ValueError(
-                    f"Недопустимое имя модели: '{kwargs['model_name_or_path']}'"
+                    f"Недопустимое имя модели или параметры: '{kwargs.get('model_name_or_path', 'не указано')}'"
                 )
-        elif method == "model2v ec":
-            print("In process, plese use sentence_transformer")
+        elif method == "model2vec":
+            logger.warning(
+                "model2vec в процессе разработки, используйте sentence_transformer"
+            )
             return None
         elif method == "huggingface":
-            print("In process, plese use sentence_transformer")
+            logger.warning(
+                "huggingface в процессе разработки, используйте sentence_transformer"
+            )
             return None
         elif method == "flair":
-            print("In process, plese use sentence_transformer")
+            logger.warning(
+                "flair в процессе разработки, используйте sentence_transformer"
+            )
             return None
         elif method == "spacy":
-            print("In process, plese use sentence_transformer")
+            logger.warning(
+                "spacy в процессе разработки, используйте sentence_transformer"
+            )
             return None
         elif method == "use":
-            print("In process, plese use sentence_transformer")
+            logger.warning(
+                "use в процессе разработки, используйте sentence_transformer"
+            )
             return None
         elif method == "gensim":
-            print("In process, plese use sentence_transformer")
+            logger.warning(
+                "gensim в процессе разработки, используйте sentence_transformer"
+            )
             return None
         elif method == "sklearn":
-            print("In process, plese use sentence_transformer")
+            logger.warning(
+                "sklearn в процессе разработки, используйте sentence_transformer"
+            )
             return None
         elif method == "openai":
-            print("In process, plese use sentence_transformer")
+            logger.warning(
+                "openai в процессе разработки, используйте sentence_transformer"
+            )
             return None
         elif method == "cohere":
-            print("In process, plese use sentence_transformer")
+            logger.warning(
+                "cohere в процессе разработки, используйте sentence_transformer"
+            )
             return None
         elif method == "multimodal":
-            print("In process, plese use sentence_transformer")
+            logger.warning(
+                "multimodal в процессе разработки, используйте sentence_transformer"
+            )
             return None
         elif method == "customback":
-            print("In process, plese use sentence_transformer")
+            logger.warning(
+                "customback в процессе разработки, используйте sentence_transformer"
+            )
             return None
         elif method == "customembed":
-            print("In process, plese use sentence_transformer")
+            logger.warning(
+                "customembed в процессе разработки, используйте sentence_transformer"
+            )
             return None
         elif method == "tfidf":
-            print("In process, plese use sentence_transformer")
+            logger.warning(
+                "tfidf в процессе разработки, используйте sentence_transformer"
+            )
             return None
         else:
             raise ValueError(f"Недопустимое имя метода: '{method}'")
@@ -134,26 +165,37 @@ class ReductionModel:
         method: Literal["umap", "svd", "pca", "skip", "custom"] = "umap",
         **kwargs,
     ):
-        if method == "umap" or method == "custom":
-            from umap import UMAP
+        try:
+            if method == "umap" or method == "custom":
+                from umap import UMAP
 
-            if method == "custom":
-                print("In process, now used umap")
-            return UMAP(**kwargs)
-        elif method == "svd":
-            from sklearn.decomposition import TruncatedSVD
+                if method == "custom":
+                    logger.warning("custom в процессе разработки, используется umap")
+                return UMAP(**kwargs)
+            elif method == "svd":
+                from sklearn.decomposition import TruncatedSVD
 
-            return TruncatedSVD(**kwargs)
-        elif method == "pca":
-            from sklearn.decomposition import PCA
+                return TruncatedSVD(**kwargs)
+            elif method == "pca":
+                from sklearn.decomposition import PCA
 
-            return PCA(**kwargs)
-        elif method == "skip":
-            from bertopic.dimensionality import BaseDimensionalityReduction
+                return PCA(**kwargs)
+            elif method == "skip":
+                from bertopic.dimensionality import BaseDimensionalityReduction
 
-            return BaseDimensionalityReduction()
-        else:
-            raise ValueError(f"Недопустимый метод: {method}")
+                return BaseDimensionalityReduction()
+            else:
+                raise ValueError(f"Недопустимый метод: {method}")
+        except ImportError as e:
+            logger.error(f"Ошибка импорта для метода {method}: {e}")
+            raise ValueError(
+                f"Не удалось импортировать зависимости для метода '{method}': {e}"
+            )
+        except Exception as e:
+            logger.error(
+                f"Ошибка при создании модели снижения размерности {method}: {e}"
+            )
+            raise ValueError(f"Ошибка при создании модели снижения размерности: {e}")
 
 
 class ClusteringModel:
@@ -168,7 +210,7 @@ class ClusteringModel:
 
     Параметры:
     ----------
-    model_name : str, по умолчанию "hdbscan"
+    method : str, по умолчанию "hdbscan"
         Название алгоритма кластеризации
     **kwargs : dict
         Дополнительные параметры для выбранного алгоритма
@@ -186,25 +228,34 @@ class ClusteringModel:
 
     def __new__(
         cls,
-        model_name: Literal["hdbscan", "kmeans", "agglomerative", "custom"] = "hdbscan",
+        method: Literal["hdbscan", "kmeans", "agglomerative", "custom"] = "hdbscan",
         **kwargs,
     ):
-        if model_name == "hdbscan" or model_name == "custom":
-            from sklearn.cluster import HDBSCAN
+        try:
+            if method == "hdbscan" or method == "custom":
+                from sklearn.cluster import HDBSCAN
 
-            if model_name == "custom":
-                print("In process, now used hdbscan")
-            return HDBSCAN(**kwargs)
-        elif model_name == "kmeans":
-            from sklearn.cluster import KMeans
+                if method == "custom":
+                    logger.warning("custom в процессе разработки, используется hdbscan")
+                return HDBSCAN(**kwargs)
+            elif method == "kmeans":
+                from sklearn.cluster import KMeans
 
-            return KMeans(**kwargs)
-        elif model_name == "agglomerative":
-            from sklearn.cluster import AgglomerativeClustering
+                return KMeans(**kwargs)
+            elif method == "agglomerative":
+                from sklearn.cluster import AgglomerativeClustering
 
-            return AgglomerativeClustering(**kwargs)
-        else:
-            raise ValueError(f"Недопустимый метод: {model_name}")
+                return AgglomerativeClustering(**kwargs)
+            else:
+                raise ValueError(f"Недопустимый метод: {method}")
+        except ImportError as e:
+            logger.error(f"Ошибка импорта для метода {method}: {e}")
+            raise ValueError(
+                f"Не удалось импортировать зависимости для метода '{method}': {e}"
+            )
+        except Exception as e:
+            logger.error(f"Ошибка при создании модели кластеризации {method}: {e}")
+            raise ValueError(f"Ошибка при создании модели кластеризации: {e}")
 
 
 class VectorizerModel:
@@ -238,16 +289,25 @@ class VectorizerModel:
         model_name: Literal["count", "countonline"] = "count",
         **kwargs,
     ):
-        if model_name == "count":
-            from sklearn.feature_extraction.text import CountVectorizer
+        try:
+            if model_name == "count":
+                from sklearn.feature_extraction.text import CountVectorizer
 
-            return CountVectorizer(**kwargs)
-        elif model_name == "countonline":
-            from bertopic.vectorizers import OnlineCountVectorizer
+                return CountVectorizer(**kwargs)
+            elif model_name == "countonline":
+                from bertopic.vectorizers import OnlineCountVectorizer
 
-            return OnlineCountVectorizer(**kwargs)
-        else:
-            raise ValueError(f"Недопустимый метод: {model_name}")
+                return OnlineCountVectorizer(**kwargs)
+            else:
+                raise ValueError(f"Недопустимый метод: {model_name}")
+        except ImportError as e:
+            logger.error(f"Ошибка импорта для метода {model_name}: {e}")
+            raise ValueError(
+                f"Не удалось импортировать зависимости для метода '{model_name}': {e}"
+            )
+        except Exception as e:
+            logger.error(f"Ошибка при создании модели векторизации {model_name}: {e}")
+            raise ValueError(f"Ошибка при создании модели векторизации: {e}")
 
 
 class RepresentationModel:
@@ -294,24 +354,38 @@ class RepresentationModel:
         ] = "keybertinspired",
         **kwargs,
     ):
-        if method == "keybertinspired":
-            from bertopic.representation import KeyBERTInspired
+        try:
+            if method == "keybertinspired":
+                from bertopic.representation import KeyBERTInspired
 
-            return KeyBERTInspired()
-        elif method == "transformers":
-            from bertopic.representation import TextGeneration
+                return KeyBERTInspired()
+            elif method == "transformers":
+                from bertopic.representation import TextGeneration
 
-            try:
-                return TextGeneration(**kwargs)
-            except Exception:
-                raise ValueError(f"Недопустимое имя модели: '{kwargs['model_name']}'")
-        elif method == "openai":
-            from bertopic.representation import OpenAI
+                try:
+                    return TextGeneration(**kwargs)
+                except Exception as e:
+                    logger.error(f"Ошибка при создании TextGeneration: {e}")
+                    raise ValueError(
+                        f"Недопустимое имя модели или параметры: '{kwargs.get('model', 'не указано')}'"
+                    )
+            elif method == "openai":
+                from bertopic.representation import OpenAI
 
-            return OpenAI(**kwargs)
-        else:
-            print("In process, plese use keybert or transformers")
-            return None
+                return OpenAI(**kwargs)
+            else:
+                logger.warning(
+                    f"Метод {method} в процессе разработки, используйте keybertinspired или transformers"
+                )
+                return None
+        except ImportError as e:
+            logger.error(f"Ошибка импорта для метода {method}: {e}")
+            raise ValueError(
+                f"Не удалось импортировать зависимости для метода '{method}': {e}"
+            )
+        except Exception as e:
+            logger.error(f"Ошибка при создании модели представления {method}: {e}")
+            raise ValueError(f"Ошибка при создании модели представления: {e}")
 
 
 # Создаем более осмысленные названия для топиков
@@ -336,42 +410,77 @@ def create_topic_names(topic_model, embedding_model, stop_words=None) -> dict:
     dict
         Словарь с новыми названиями топиков
     """
-    from keybert import KeyBERT
+    try:
+        from keybert import KeyBERT
 
-    keybert_model = KeyBERT(model=embedding_model)
+        keybert_model = KeyBERT(model=embedding_model)
 
-    # Получаем информацию о топиках
-    topic_info = topic_model.get_topic_info()
-    topic_docs = {}
+        # Получаем информацию о топиках
+        topic_info = topic_model.get_topic_info()
+        topic_docs = {}
 
-    # Для каждого топика (кроме -1, который означает выбросы) получаем репрезентативные документы
-    for topic_id in topic_info[topic_info["Topic"] != -1]["Topic"]:
-        # Получаем документы для данного топика
-        documents = topic_model.get_representative_docs(topic_id)
-        topic_docs[topic_id] = " ".join(documents)
+        # Для каждого топика (кроме -1, который означает выбросы) получаем репрезентативные документы
+        for topic_id in topic_info[topic_info["Topic"] != -1]["Topic"]:
+            # Получаем документы для данного топика
+            documents = topic_model.get_representative_docs(topic_id)
+            topic_docs[topic_id] = " ".join(documents)
 
-    # Создаем словарь для хранения новых названий топиков
-    topic_names = {}
+        # Создаем словарь для хранения новых названий топиков
+        topic_names = {}
 
-    # Для каждого топика генерируем ключевые фразы
-    for topic_id, doc in topic_docs.items():
-        # Извлекаем ключевые фразы (3 слова) из документов топика
-        keywords = keybert_model.extract_keywords(
-            doc, keyphrase_ngram_range=(3, 3), stop_words=stop_words, top_n=1
-        )
+        # Для каждого топика генерируем ключевые фразы
+        for topic_id, doc in topic_docs.items():
+            try:
+                # Извлекаем ключевые фразы (3 слова) из документов топика
+                keywords = keybert_model.extract_keywords(
+                    doc, keyphrase_ngram_range=(3, 3), stop_words=stop_words, top_n=1
+                )
 
-        if keywords:
-            # Берем первую ключевую фразу как название топика
-            topic_names[topic_id] = keywords[0][0]
-        else:
-            # Если не удалось извлечь фразу, используем оригинальное название
-            words = topic_model.get_topic(topic_id)
-            topic_names[topic_id] = f"Топик_{topic_id}_{words[0][0]}_{words[1][0]}"
+                if keywords:
+                    # Берем первую ключевую фразу как название топика
+                    topic_names[topic_id] = keywords[0][0]
+                else:
+                    # Если не удалось извлечь фразу, используем оригинальное название
+                    words = topic_model.get_topic(topic_id)
+                    if words and len(words) >= 2:
+                        topic_names[topic_id] = (
+                            f"Топик_{topic_id}_{words[0][0]}_{words[1][0]}"
+                        )
+                    else:
+                        topic_names[topic_id] = f"Топик_{topic_id}"
+            except Exception as e:
+                logger.warning(
+                    f"Ошибка при создании названия для топика {topic_id}: {e}"
+                )
+                topic_names[topic_id] = f"Топик_{topic_id}"
 
-    # Переименовываем топики в модели
-    topic_model.set_topic_labels(topic_names)
+        # Переименовываем топики в модели
+        try:
+            topic_model.set_topic_labels(topic_names)
+        except Exception as e:
+            logger.warning(f"Не удалось установить метки топиков в модели: {e}")
 
-    return topic_names
+        return topic_names
+
+    except ImportError as e:
+        logger.error(f"Ошибка импорта KeyBERT: {e}")
+        # Возвращаем дефолтные названия
+        topic_info = topic_model.get_topic_info()
+        return {
+            topic_id: f"Топик_{topic_id}"
+            for topic_id in topic_info[topic_info["Topic"] != -1]["Topic"]
+        }
+    except Exception as e:
+        logger.error(f"Ошибка при создании названий топиков: {e}")
+        # Возвращаем дефолтные названия
+        try:
+            topic_info = topic_model.get_topic_info()
+            return {
+                topic_id: f"Топик_{topic_id}"
+                for topic_id in topic_info[topic_info["Topic"] != -1]["Topic"]
+            }
+        except Exception:
+            return {}
 
 
 # Применяем функцию для создания названий топиков
