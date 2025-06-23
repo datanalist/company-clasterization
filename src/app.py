@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Depends, status, BackgroundTasks
+from fastapi import FastAPI, HTTPException, Depends, status, BackgroundTasks, Response
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 import os
@@ -180,9 +180,24 @@ async def start_clustering(
 
 
 @app.get("/api/clustering/results", response_model=list[ClusteringResult])
-def get_user_clustering_results(current_user: dict = Depends(get_current_user)):
+def get_user_clustering_results(
+    response: Response,
+    current_user: dict = Depends(get_current_user),
+    _t: str = None,  # Параметр для обхода кэширования
+):
     try:
+        # Добавляем заголовки против кэширования
+        response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "0"
+
+        logger.info(
+            f"Получение результатов кластеризации для пользователя {current_user['id']}"
+        )
         results = get_clustering_results(user_id=current_user["id"])
+        logger.info(
+            f"Найдено {len(results)} результатов для пользователя {current_user['id']}"
+        )
         return results
     except Exception as e:
         logger.error(f"Ошибка при получении результатов кластеризации: {e}")

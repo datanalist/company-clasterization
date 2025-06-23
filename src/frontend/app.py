@@ -170,11 +170,20 @@ def start_clustering(token: str, date_range: dict, ml_config=None):
 
 
 def get_clustering_results(token: str):
-    """Получение результатов кластеризации"""
+    """Получение результатов кластеризации без кэширования"""
+    import time
+
+    # Добавляем timestamp чтобы предотвратить кэширование на уровне браузера
+    timestamp = int(time.time())
     return make_request(
         "GET",
-        f"{API_URL}/api/clustering/results",
-        headers={"Authorization": f"Bearer {token}"},
+        f"{API_URL}/api/clustering/results?_t={timestamp}",
+        headers={
+            "Authorization": f"Bearer {token}",
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            "Pragma": "no-cache",
+            "Expires": "0",
+        },
     )
 
 
@@ -932,6 +941,8 @@ def show_clustering_page(user_info: dict):
                     user_info, _ = get_user_info(st.session_state["token"])
                     st.session_state["user_info"] = user_info
                     # Автоматически обновляем страницу через несколько секунд
+                    import time
+
                     time.sleep(2)
                     st.rerun()
                 else:
@@ -942,10 +953,30 @@ def show_clustering_page(user_info: dict):
     # Секция с результатами кластеризации
     st.markdown("### Результаты кластеризации")
 
-    if st.button("Обновить результаты"):
-        st.rerun()
+    # Кнопка для принудительного обновления
+    col1, col2 = st.columns([1, 4])
+    with col1:
+        if st.button("🔄 Обновить", help="Принудительно обновить результаты"):
+            # Очищаем все кэши Streamlit
+            st.cache_data.clear()
+            st.cache_resource.clear()
+            # Принудительно перезагружаем страницу
+            st.rerun()
 
-    # Получаем результаты кластеризации
+    with col2:
+        auto_refresh = st.checkbox("Автообновление каждые 30 секунд", value=False)
+
+    # Автообновление для задач в процессе выполнения
+    if auto_refresh:
+        # Добавляем метку времени для предотвращения кэширования
+        import time
+
+        refresh_key = (
+            f"refresh_{int(time.time() // 30)}"  # Обновляется каждые 30 секунд
+        )
+        st.markdown(f"<!-- {refresh_key} -->", unsafe_allow_html=True)
+
+    # Получаем результаты кластеризации без кэширования
     with st.spinner("Загрузка результатов..."):
         results, status_code = get_clustering_results(st.session_state["token"])
 
@@ -958,6 +989,29 @@ def show_clustering_page(user_info: dict):
     if not results:
         st.info("У вас пока нет результатов кластеризации.")
         return
+
+    # Проверяем, есть ли задачи в процессе выполнения
+    has_running_tasks = any(
+        result["status"] not in ["completed", "failed"] for result in results
+    )
+
+    if has_running_tasks:
+        st.info(
+            "⏳ Есть задачи в процессе выполнения. Результаты обновятся автоматически."
+        )
+        # Добавляем счетчик для автообновления
+        if auto_refresh and "auto_refresh_counter" not in st.session_state:
+            st.session_state.auto_refresh_counter = 0
+
+        # Если включено автообновление или есть выполняющиеся задачи
+        if auto_refresh or has_running_tasks:
+            # Показываем обратный отсчет
+            placeholder = st.empty()
+            for i in range(10, 0, -1):
+                placeholder.text(f"Автообновление через {i} секунд...")
+                time.sleep(1)
+            placeholder.empty()
+            st.rerun()
 
     # Отображение результатов
     for result in results:
