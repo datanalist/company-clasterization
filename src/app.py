@@ -4,7 +4,6 @@ import uvicorn
 import os
 from datetime import datetime
 import pandas as pd
-import json
 import uuid
 import asyncio
 import logging
@@ -51,6 +50,7 @@ from database.database import (
     get_math_problem,
     validate_math_solution,
     get_user_by_id,
+    safe_json_dump,
 )
 from utils.auth import (
     get_password_hash,
@@ -880,7 +880,7 @@ async def perform_clustering_task(
             # Сохраняем визуализацию для последующего использования
             viz_path = f"data/processed/viz_{task_id}.json"
             with open(viz_path, "w", encoding="utf-8") as f:
-                json.dump(visualization_data, f, ensure_ascii=False)
+                safe_json_dump(visualization_data, f, ensure_ascii=False)
 
             logger.info(f"Task {task_id}: Визуализация сохранена")
 

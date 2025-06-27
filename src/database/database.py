@@ -7,12 +7,59 @@ import math
 import operator
 import logging
 
+try:
+    import numpy as np
+
+    HAS_NUMPY = True
+except ImportError:
+    HAS_NUMPY = False
+
 # Настройка логирования
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Путь к базе данных
 DB_PATH = "database.db"
+
+
+class JSONEncoder(json.JSONEncoder):
+    """
+    Кастомный JSON энкодер для работы с NumPy типами данных
+    """
+
+    def default(self, obj):
+        if HAS_NUMPY:
+            if isinstance(obj, np.integer):
+                return int(obj)
+            elif isinstance(obj, np.floating):
+                return float(obj)
+            elif isinstance(obj, np.ndarray):
+                return obj.tolist()
+            elif isinstance(obj, np.bool_):
+                return bool(obj)
+            elif hasattr(obj, "item") and hasattr(obj, "dtype"):  # для numpy скаляров
+                return obj.item()
+
+        # Обработка pandas типов данных (если они есть)
+        if hasattr(obj, "dtype") and hasattr(obj, "item"):  # pandas scalar
+            return obj.item()
+
+        return super().default(obj)
+
+
+def safe_json_dumps(obj, **kwargs):
+    """
+    Безопасная сериализация в JSON с поддержкой NumPy типов
+    """
+    return json.dumps(obj, cls=JSONEncoder, **kwargs)
+
+
+def safe_json_dump(obj, fp, **kwargs):
+    """
+    Безопасная запись в JSON файл с поддержкой NumPy типов
+    """
+    return json.dump(obj, fp, cls=JSONEncoder, **kwargs)
+
 
 # Безопасный парсер математических выражений
 ALLOWED_OPERATORS = {
@@ -228,10 +275,9 @@ def initialize_database():
                 (
                     "rubert-tiny2",
                     "embedding",
-                    json.dumps(
+                    safe_json_dumps(
                         {
                             "model_name_or_path": "cointegrated/rubert-tiny2",
-                            "max_length": 128,
                         }
                     ),
                     1,  # Дефолтная модель
@@ -248,7 +294,7 @@ def initialize_database():
                 (
                     "UMAP",
                     "reduction",
-                    json.dumps(
+                    safe_json_dumps(
                         {
                             "method": "umap",
                             "n_neighbors": 15,
@@ -271,7 +317,7 @@ def initialize_database():
                 (
                     "HDBSCAN",
                     "clustering",
-                    json.dumps(
+                    safe_json_dumps(
                         {
                             "method": "hdbscan",
                             "min_cluster_size": 5,
@@ -462,10 +508,10 @@ def save_clustering_result(result: dict) -> bool:
     cursor = conn.cursor()
 
     try:
-        # Сериализуем JSON-поля
-        date_range_json = json.dumps(result["date_range"])
-        clusters_json = json.dumps(result.get("clusters", None))
-        ml_config_json = json.dumps(result.get("ml_config", None))
+        # Сериализуем JSON-поля с поддержкой NumPy типов
+        date_range_json = safe_json_dumps(result["date_range"])
+        clusters_json = safe_json_dumps(result.get("clusters", None))
+        ml_config_json = safe_json_dumps(result.get("ml_config", None))
 
         cursor.execute(
             """
@@ -777,7 +823,7 @@ def add_ml_model(model_data: dict) -> dict:
             (
                 model_data["name"],
                 model_data["type"],
-                json.dumps(model_data["config"]),
+                safe_json_dumps(model_data["config"]),
                 1 if model_data.get("is_default", False) else 0,
                 datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             ),
