@@ -68,33 +68,75 @@ streamlit run app.py
 
 ```
 company-clasterization/
-├── src/
-│   ├── app.py                # Основной файл FastAPI приложения
-│   ├── ml_core/              # Модули для работы с ML-моделями
-│   │   ├── models.py         # Классы моделей
-│   │   ├── cluster_plot.py   # Визуализация кластеров
-│   │   ├── pipeline.py       # ML-пайплайн
-│   │   └── __init__.py
-│   ├── data/                 # Модули для работы с данными
-│   │   ├── prepare.py        # Подготовка и очистка данных
-│   │   ├── parse_tg.py       # Парсинг Telegram
-│   │   ├── parse_lenta.py    # Парсинг Lenta.ru
-│   │   └── __init__.py
-│   ├── models/               # Модели данных (Pydantic)
-│   │   └── models.py
-│   ├── database/             # Работа с базой данных
+├── __init__.py
+├── config.ini               # Конфигурационный файл
+├── dagster/                 # Dagster пайплайн
+│   └── dagster-pipeline/
+│       ├── dagster_pipeline/
+│       │   ├── __init__.py
+│       │   ├── assets.py    # Dagster ассеты
+│       │   ├── definitions.py
+│       │   ├── exps.ipynb   # Эксперименты
+│       │   └── parse_lenta.py # Парсинг Lenta.ru
+│       ├── dagster_pipeline_tests/
+│       │   ├── __init__.py
+│       │   └── test_assets.py
+│       ├── data/
+│       ├── pyproject.toml
+│       └── README.md
+├── data/                    # Данные
+├── docker/                  # Docker конфигурация
+├── docs/                    # Документация
+│   ├── Architecture.drawio
+│   ├── Architecture.png
+│   ├── Block-scheme.png
+│   ├── current_architecture.png
+│   ├── DCMML_hw_3.md
+│   ├── Global_Asset_Lineage.svg
+│   └── ml_system_design_doc.md  # Дизайн документ
+├── examples/                # Примеры использования
+│   ├── cv_coherence_example.py
+│   └── topic_evaluation_example.py
+├── models/                  # Сохраненные модели
+│   ├── bertopic_model
+│   ├── bpe_model.vocab.model
+│   └── bpe_model.vocab.vocab
+├── notebooks/               # Jupyter ноутбуки
+│   ├── DCMML_hw_2.ipynb
+│   └── topics.ipynb
+├── src/                     # Основной код
+│   ├── __init__.py
+│   ├── app.py               # Основной файл FastAPI приложения
+│   ├── data/                # Модули для работы с данными
+│   ├── database/            # Работа с базой данных
+│   │   ├── __init__.py
 │   │   └── database.py
-│   ├── utils/                # Вспомогательные функции
-│   │   └── auth.py           # Аутентификация
-│   └── frontend/             # Streamlit приложение
-│       └── app.py
-├── data/                     # Данные
-│   ├── raw/                  # Сырые данные
-│   └── processed/            # Обработанные данные
-├── models/                   # Сохраненные модели
-├── requirements.txt          # Зависимости проекта
-├── README.md                 # Документация
-└── .env                      # Переменные окружения
+│   ├── frontend/            # Streamlit приложение
+│   │   └── app.py
+│   ├── ml_core/             # Модули для работы с ML-моделями
+│   │   ├── __init__.py
+│   │   ├── cluster_plot.py  # Визуализация кластеров
+│   │   ├── models.py        # Классы моделей
+│   │   ├── pipeline.py      # ML-пайплайн
+│   │   ├── topic_evaluation.py
+│   │   └── utils.py
+│   ├── models/              # Модели данных (Pydantic)
+│   │   └── models.py
+│   ├── utils/               # Вспомогательные функции
+│   │   ├── __init__.py
+│   │   └── auth.py          # Аутентификация
+│   ├── test.ipynb
+│   └── utils_.py
+├── tests/                   # Тесты
+├── LICENSE
+├── pdm.lock
+├── pyproject.toml
+├── README.md                # Документация
+├── requirements.txt         # Зависимости проекта
+├── ruff.toml               # Конфигурация линтера
+├── run.py                  # Скрипт для запуска
+├── setup.py
+└── .env                    # Переменные окружения
 ```
 
 ## Дополнительная информация

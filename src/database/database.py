@@ -226,11 +226,11 @@ def initialize_database():
             VALUES (?, ?, ?, ?, ?)
             """,
                 (
-                    "LaBSE",
+                    "rubert-tiny2",
                     "embedding",
                     json.dumps(
                         {
-                            "model_name_or_path": "sentence-transformers/LaBSE",
+                            "model_name_or_path": "cointegrated/rubert-tiny2",
                             "max_length": 128,
                         }
                     ),
