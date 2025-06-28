@@ -8,6 +8,8 @@ __pycache__/
 # C extensions
 *.so
 
+./database.db
+
 # Distribution / packaging
 .Python
 build/
@@ -181,3 +183,6 @@ data/raw/*
 data/processed/*
 data/interim/*
 data/external/*
+dagster/dagster-pipeline/data/raw/lenta-news.csv
+database.db
+database.db

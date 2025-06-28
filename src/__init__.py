@@ -1,4 +1,14 @@
-from .data import merge_csv_news
-from .ml_core import TopicModelEvaluator, quick_evaluate_bertopic
+"""
+Пакет src
+"""
 
-__all__ = ["merge_csv_news", "TopicModelEvaluator", "quick_evaluate_bertopic"]
+# from .ml_core import *
+# from .database import *
+# from .utils import *
+import ml_core
+import database
+import utils
+import data
+# from .data import parse_lenta_news
+
+__all__ = ["ml_core", "database", "utils", "data"]
