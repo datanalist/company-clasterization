@@ -484,3 +484,60 @@ def create_topic_names(topic_model, embedding_model, stop_words=None) -> dict:
 
 
 # Применяем функцию для создания названий топиков
+
+
+def apply_topic_names(topic_model, embedding_model, stop_words=None):
+    """
+    Применяет осмысленные названия к топикам модели.
+
+    Эта функция является оберткой для create_topic_names, которая
+    автоматически создает и применяет новые названия топиков.
+
+    Параметры:
+    ----------
+    topic_model : BERTopic
+        Модель BERTopic с обученными топиками
+    embedding_model : модель для эмбеддингов
+        Модель для создания эмбеддингов текста
+    stop_words : list, optional
+        Список стоп-слов для исключения из ключевых фраз
+
+    Возвращает:
+    ----------
+    dict
+        Словарь с новыми названиями топиков
+
+    Пример использования:
+    ------------------
+    # После обучения модели
+    topics, probs = topic_model.fit_transform(documents)
+
+    # Применяем новые названия топиков
+    new_names = apply_topic_names(topic_model, embedding_model, stop_words)
+
+    # Проверяем результат
+    print("Новые названия топиков:")
+    for topic_id, name in new_names.items():
+        print(f"Топик {topic_id}: {name}")
+    """
+    logger.info("🏷️ Создание осмысленных названий топиков с помощью KeyBERT...")
+
+    try:
+        # Создаем новые названия топиков
+        new_topic_names = create_topic_names(topic_model, embedding_model, stop_words)
+
+        if new_topic_names:
+            logger.info(f"✅ Успешно создано {len(new_topic_names)} названий топиков")
+
+            # Выводим созданные названия для информации
+            for topic_id, name in new_topic_names.items():
+                logger.info(f"Топик {topic_id}: {name}")
+
+            return new_topic_names
+        else:
+            logger.warning("⚠️ Не удалось создать названия топиков")
+            return {}
+
+    except Exception as e:
+        logger.error(f"❌ Ошибка при применении названий топиков: {e}")
+        return {}

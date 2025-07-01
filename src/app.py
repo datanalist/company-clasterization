@@ -12,7 +12,7 @@ from ml_core.models import (
     EmbeddingModel,
     ReductionModel,
     ClusteringModel,
-    create_topic_names,
+    apply_topic_names,
 )
 from data.prepare import clean_text
 from models.models import (
@@ -713,24 +713,31 @@ async def perform_clustering_task(
             def __init__(self):
                 self.topics_ = clusters
                 self.documents = news_df["cleaned_text"].tolist()
+                self.topic_labels = {}
 
             def get_topic_info(self):
-                topics = pd.DataFrame({"Topic": list(set(clusters))})
+                # Убираем -1 (выбросы) из списка топиков
+                topics = pd.DataFrame({"Topic": [t for t in set(clusters) if t != -1]})
                 return topics
 
             def get_representative_docs(self, topic_id):
                 indices = [i for i, t in enumerate(clusters) if t == topic_id]
-                return [self.documents[i] for i in indices]
+                # Возвращаем максимум 10 репрезентативных документов
+                selected_indices = indices[:10] if len(indices) > 10 else indices
+                return [self.documents[i] for i in selected_indices]
 
             def get_topic(self, topic_id):
                 indices = [i for i, t in enumerate(clusters) if t == topic_id]
+                if not indices:
+                    return []
                 docs = [self.documents[i] for i in indices]
                 words = " ".join(docs).split()
                 word_count = {}
                 for word in words:
-                    if word not in word_count:
-                        word_count[word] = 0
-                    word_count[word] += 1
+                    if len(word) > 2:  # Фильтруем слишком короткие слова
+                        if word not in word_count:
+                            word_count[word] = 0
+                        word_count[word] += 1
                 sorted_words = sorted(
                     word_count.items(), key=lambda x: x[1], reverse=True
                 )
@@ -738,12 +745,31 @@ async def perform_clustering_task(
 
             def set_topic_labels(self, topic_names):
                 self.topic_labels = topic_names
+                logger.info(f"Установлены метки для {len(topic_names)} топиков")
 
         topic_model = TopicModel()
 
         try:
-            topic_names = create_topic_names(topic_model, embedding_model)
-            logger.info(f"Task {task_id}: Названия топиков созданы")
+            # Импортируем стоп-слова для русского языка
+            try:
+                from nltk.corpus import stopwords
+                import nltk
+
+                nltk.download("stopwords", quiet=True)
+                stop_words = stopwords.words("russian")
+            except Exception as e:
+                stop_words = None
+                logger.warning(f"Ошибка при загрузке стоп-слов {e}")
+
+            # Применяем функцию создания названий топиков
+            topic_names = apply_topic_names(topic_model, embedding_model, stop_words)
+            logger.info(f"Task {task_id}: Создано {len(topic_names)} названий топиков")
+
+            # Если не удалось создать названия, используем дефолтные
+            if not topic_names:
+                topic_names = {i: f"Топик {i}" for i in set(clusters) if i != -1}
+                logger.info(f"Task {task_id}: Используются дефолтные названия топиков")
+
         except Exception as e:
             logger.warning(
                 f"Task {task_id}: Ошибка при создании названий топиков: {e}. Используем дефолтные названия."
